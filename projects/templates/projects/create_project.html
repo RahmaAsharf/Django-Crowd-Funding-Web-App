@@ -1,21 +1,102 @@
-<div class="px-4 py-5 my-5 text-center">
-    <h1 class="display-5 fw-bold">Add New Project</h1>
-    <div class="col-lg-6 mx-auto">
-        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-            <form id="post_form" method="post" action="" enctype="multipart/form-data">
-                {% csrf_token %}
-                {% for hidden in form.hidden_fields %}
-                    {{ hidden }}
-                {% endfor %}
-                {% for field in form %}
-                    {{ field }} <br />
-                {% endfor %}
-                {{ imageform.management_form }}
-                {% for form in imageform %}
-                    {{ form }} <br />
-                {% endfor %}
-                <input type="submit" name="submit" value="Submit" />
-            </form>
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block 'content' %}
+<div class="container py-3">
+    <h1 class="display-6 text-center mb-5">Add New Project</h1>
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="card shadow">
+                <div class="card-body ">
+                    <form id="post_form" method="post" action="" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% for hidden in form.hidden_fields %}
+                            {{ hidden }}
+                        {% endfor %}
+                        {{ form.field_name.errors }}
+                        
+                        <!-- Title Field -->
+                        <div class="mb-3">
+                            {{ form.title.label_tag }}
+                            {{ form.title }}
+                            {% if form.title.help_text %}
+                                <small class="form-text text-muted">{{ form.title.help_text }}</small>
+                            {% endif %}
+                        </div>
+
+                        <!-- Details Field -->
+                        <div class="mb-3">
+                            {{ form.details.label_tag }}
+                            {{ form.details }} 
+                            {% if form.details.help_text %}
+                                <small class="form-text text-muted">{{ form.details.help_text }}</small>
+                            {% endif %}
+                        </div>
+
+                        <!-- Category and Tags Fields -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                {{ form.category.label_tag }}
+                                {{ form.category }}
+                                {% if form.category.help_text %}
+                                    <small class="form-text text-muted">{{ form.category.help_text }}</small>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.tags.label_tag }}
+                                {{ form.tags }}
+                                {% if form.tags.help_text %}
+                                    <small class="form-text text-muted">{{ form.tags.help_text }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Start Date and Total Fields -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                {{ form.startDate.label_tag }}
+                                {{ form.startDate }}
+                                {% if form.startDate.help_text %}
+                                    <small class="form-text text-muted">{{ form.startDate.help_text }}</small>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.total.label_tag }}
+                                {{ form.total }}
+                                {% if form.total.help_text %}
+                                    <small class="form-text text-muted">{{ form.total.help_text }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- End Date Field -->
+                        <div class="mb-3">
+                            {{ form.endDate.label_tag }}
+                            {{ form.endDate }}
+                            {% if form.endDate.help_text %}
+                                <small class="form-text text-muted">{{ form.endDate.help_text }}</small>
+                            {% endif %}
+                        </div>
+
+                        <!-- Image Field -->
+                        <div class="mb-3">
+                            {{ imageform.management_form }}
+                            {% for img_form in imageform %}
+                                {{ img_form.label_tag }}
+                                {{ img_form }}
+                                {% if img_form.help_text %}
+                                    <small class="form-text text-muted">{{ img_form.help_text }}</small>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <div class="text-center">
+                            <button class="btn btn-primary btn-lg btn-block " type="submit" name="submit">Submit</button>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+{% endblock %}
