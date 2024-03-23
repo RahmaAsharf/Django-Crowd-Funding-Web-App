@@ -1,6 +1,9 @@
-from django.shortcuts import render, redirect, reverse
+from django.shortcuts import render, redirect, reverse, get_object_or_404
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
-from authentication.forms import  UserModelForm
+from authentication.forms import  UserModelForm, CustomUser
+
+
 # Create your views here.
 def landing(request):
     
@@ -14,13 +17,40 @@ def landing(request):
 def register(request):
     form = UserModelForm()
     if request.method == 'POST':
-        form = UserModelForm(request.POST)
+        form = UserModelForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()  # Save the form data to create a new user
             return HttpResponse("User created successfully.")
     return render(request, 'authentication/register.html', {'form': form})
     
 
+def view_profile(request, id):
+    user = get_object_or_404(CustomUser, pk=id)
+    return render(request, 'authentication/profile.html', {'user': user})
+
+
+def edit_profile(request, id):
+    user = get_object_or_404(CustomUser, pk=id)
+    if request.method == 'POST':
+        form = UserModelForm(request.POST, request.FILES, instance=user)
+        if form.is_valid():
+            form.save()
+            return redirect('view.profile', id=id)
+    else:
+        # Exclude the email field from the form
+        # Set initial value for password field to an empty string
+        form = UserModelForm(instance=user)
+        # form.fields['email'].disabled = True
+        # form.initial['password'] = '' 
+    return render(request, 'authentication/edit_profile.html', {'form': form, 'id': id})
+
+
+def delete_account(request, id):
+    user = get_object_or_404(CustomUser, pk=id)
+    if request.method == 'POST':
+        user.delete()
+        return redirect('landing') 
+    return render(request, 'authentication/delete_account.html', {'user': user})
 
 
 
