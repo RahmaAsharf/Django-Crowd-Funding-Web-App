@@ -1,0 +1,45 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block 'content' %}
+    <h1 class="text-center mb-4">All Projects</h1>
+    <div class="row">
+        {% for project in Projects %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">{{ project.title }}</h2>
+                    <p class="card-text">{{ project.details }}</p>
+                    <p class="card-text">Total: {{ project.total }}</p>
+                    <p class="card-text">Start Date: {{ project.startDate }}</p>
+                    <p class="card-text">End Date: {{ project.endDate }}</p>
+                    <p class="card-text">Category: {{ project.category.name }}</p>
+                    <h3>Tags:</h3>
+                    <ul class="list-unstyled">
+                        {% for tag in project.tags.all %}
+                        <li>{{ tag.name }}</li>
+                        {% endfor %}
+                    </ul>
+                    <div class="text-center mt-3">
+                        <a href="#" class="btn btn-primary btn-comment">Comment</a>
+                        <a href="#" class="btn btn-secondary btn-rate">Rate</a>
+                        <a href="#" class="btn btn-success btn-donate">Donate</a>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <h3>Images:</h3>
+                    <div class="row">
+                        {% for image in project.image_set.all %}
+                        <div class="col-4 mb-3">
+                            <div class="card">
+                                <img src="{{ image.image.url }}" class="card-img-top" alt="Project Image">
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% endblock %}

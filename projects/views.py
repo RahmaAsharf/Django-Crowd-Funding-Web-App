@@ -14,7 +14,7 @@ def create_project(request):
             for file in files:
                 Image.objects.create(project=project, image=file)
             form.save_m2m()  # Save many-to-many relationships
-            return HttpResponse("Project added successfully")
+            return redirect(form.instance.show_url)
     else:
         form = ProjectForm()
         image_form = ImageForm()
@@ -23,6 +23,13 @@ def create_project(request):
     categories = Category.objects.all()
 
     return render(request, "projects/create_project.html", {"form": form, "imageform": image_form, "tags": tags, "categories": categories})
+
+def view_projects(request):
+    all_projects = Project.objects.all()
+    print (all_projects)
+    return render(request, 'projects/view_project.html', context={"Projects": all_projects})
+
+
 
 # def create_project(request):
 

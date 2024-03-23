@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.urls import reverse
 class Category(models.Model):
     name = models.CharField(max_length=100)
 
@@ -26,6 +26,12 @@ class Project(models.Model):
 
     def __str__(self):
         return self.title
+    
+    @property
+    def show_url(self):
+        url = reverse('view_projects')
+        return url
+
         
 class Image(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
