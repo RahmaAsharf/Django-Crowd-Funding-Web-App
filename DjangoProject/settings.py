@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'authentication.apps.AuthenticationConfig',
     'projects.apps.ProjectsConfig',
     'django_cleanup.apps.CleanupConfig',
 ]
@@ -77,6 +78,7 @@ WSGI_APPLICATION = 'DjangoProject.wsgi.application'
 
 DATABASES = {
     'default': {
+        # 'ENGINE': 'django.db.backends.mysql',
         'ENGINE': 'mysql.connector.django',
         'NAME': 'djangopr',
         'USER': 'iti',
