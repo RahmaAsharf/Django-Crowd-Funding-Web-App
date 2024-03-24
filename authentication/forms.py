@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import check_password
 from authentication.models import CustomUser
 
 class UserModelForm(forms.ModelForm):
@@ -33,6 +34,15 @@ class UserModelForm(forms.ModelForm):
         if not mobile_phone.startswith('01') or len(mobile_phone) != 11:
             raise forms.ValidationError("Please enter a valid Egyptian phone number")
         return mobile_phone
+    
+    def clean_password(self):
+        password = self.cleaned_data.get('password')
+        # Check if the instance is an existing user or not
+        if self.instance.pk:
+            old_password = CustomUser.objects.get(pk=self.instance.pk).password
+            if check_password(password, old_password):
+                raise forms.ValidationError("New password can't be same as old password")
+        return password
     
     def save(self, commit=True):
         self.instance.password = make_password(password=self.instance.password)
