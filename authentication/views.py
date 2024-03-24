@@ -37,7 +37,9 @@ def edit_profile(request, id):
             form.save()
             return redirect('view.profile', id=id)
     else:
-        form = UserModelForm(instance=user)
+        # form = UserModelForm(instance=user)
+        # Set initial password field to empty string when editing profile
+        form = UserModelForm(instance=user, initial={'password': ''}) 
     return render(request, 'authentication/edit_profile.html', {'form': form, 'id': id})
 
 

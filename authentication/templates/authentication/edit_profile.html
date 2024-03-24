@@ -12,51 +12,9 @@
         <div class="card-body">
           <form method="post" enctype="multipart/form-data" class="p-5">
             {% csrf_token %}
-            {{ form.non_field_errors }}
-            <div class="mb-3">
-              <label for="id_first_name" class="form-label">First Name:</label>
-              {{ form.first_name }}
-              <small class="text-danger">{{ form.first_name.errors }}</small>
-            </div>
-            <div class="mb-3">
-              <label for="id_last_name" class="form-label">Last Name:</label>
-              {{ form.last_name }}
-              <small class="text-danger">{{ form.last_name.errors }}</small>
-            </div>
-            <div class="mb-3">
-              <label for="id_email" class="form-label">Email:</label>
-              {{ form.email }}
-              <small class="text-danger">{{ form.email.errors }}</small>
-            </div>
-            <div class="mb-3">
-              <label for="id_mobile_phone" class="form-label">Mobile Phone:</label>
-              {{ form.mobile_phone }}
-              <small class="text-danger">{{ form.mobile_phone.errors }}</small>
-            </div>
-            <div class="mb-3">
-              <label for="id_profile_picture" class="form-label">Profile Picture:</label>
-              {{ form.profile_picture }}
-              <small class="text-danger">{{ form.profile_picture.errors }}</small>
-            </div>
-            <div class="mb-3">
-              <label for="id_birthdate" class="form-label">Birthdate:</label>
-              {{ form.birthdate }}
-              <small class="text-danger">{{ form.birthdate.errors }}</small>
-            </div>
-            <div class="mb-3">
-              <label for="id_facebook_profile" class="form-label">Facebook Profile:</label>
-              {{ form.facebook_profile }}
-              <small class="text-danger">{{ form.facebook_profile.errors }}</small>
-            </div>
-            <div class="mb-3">
-              <label for="id_country" class="form-label">Country:</label>
-              {{ form.country }}
-              <small class="text-danger">{{ form.country.errors }}</small>
-            </div>
-            <div class="text-center">
-              <button type="submit" class="btn btn-info">Save Changes</button>
-              <a href="{% url 'view.profile' id %}" class="btn btn-secondary">Back to Profile</a>
-            </div>
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-info">Save Changes</button>
+            <a href="{% url 'view.profile' id %}" class="btn btn-secondary">Back to Profile</a>
           </form>
         </div>
       </div>

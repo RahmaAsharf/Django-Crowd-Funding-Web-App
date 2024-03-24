@@ -1,13 +1,26 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
-
 from authentication.models import CustomUser
 
 class UserModelForm(forms.ModelForm):
     class Meta:
         model  = CustomUser
-        fields = '__all__'
+        # fields = '__all__'
+        # Retreive all form data except email field 
+        exclude = ['email']
+        widgets = {
+            'password': forms.PasswordInput(render_value=True),
+        }
+
+    # called when creating an instance of form
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Check if the form is used to edit an existing user (instance has a primary key)
+        if self.instance.pk:
+            self.fields['password'].required = False # password is not required
+        else:
+            self.fields['password'].required = True # password is required
 
     def clean_email(self):
         email = self.cleaned_data['email']
