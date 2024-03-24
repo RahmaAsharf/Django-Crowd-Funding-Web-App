@@ -15,7 +15,9 @@ class ProjectForm(forms.ModelForm):
 
     class Meta:
         model = Project
-        fields = '__all__'
+        # fields = '__all__'
+        fields = ['title', 'details', 'category', 'total', 'startDate', 'endDate', 'tags']
+        
         
     # def clean_totalDonated(self):
     #     total= self.cleaned_data.get('total')
