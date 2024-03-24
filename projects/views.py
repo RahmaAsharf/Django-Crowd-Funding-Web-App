@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect , reverse 
+from django.shortcuts import render, redirect , get_object_or_404
 from django.http import HttpResponse
 from projects.models import Project, Image, Tag, Category, Rating
 from projects.forms import DonationForm, ProjectForm, ImageForm, RatingForm
@@ -86,19 +86,36 @@ def add_commentorrate(request, id):
         form = RatingForm()
     return render(request, 'projects/rate.html', {'form': form})
    
-
 def donate(request, id):
+    project = get_object_or_404(Project, pk=id)
     if request.method == 'POST':
-        form = DonationForm(request.POST)
-        if form.is_valid():
-            data = form.save(commit=False)
-            data.project_id = id
-            data.user_id = 1  # Assuming user_id is hardcoded for testing
-            data.save()
+        donation_form = DonationForm(request.POST,project_id=id)
+        if donation_form.is_valid():
+            donation = donation_form.save(commit=False)
+            donation.project_id = id
+            donation.user_id = 1
+            donation.save()
             return redirect('project_page', id=id)
     else:
-        form = DonationForm()
-    return render(request, 'projects/donate.html', {'form': form}) 
+        donation_form = DonationForm()
+    context = {
+        'project': project,
+        'donation_form': donation_form,
+    }
+    return render(request, 'projects/project_page.html', context)            
+
+# def donate(request, id):
+#     if request.method == 'POST':
+#         form = DonationForm(request.POST)
+#         if form.is_valid():
+#             data = form.save(commit=False)
+#             data.project_id = id
+#             data.user_id = 1  # Assuming user_id is hardcoded for testing
+#             data.save()
+#             return redirect('project_page', id=id)
+#     else:
+#         form = DonationForm()
+#         return render(request, 'projects/donate.html', {'form': form}) 
 
 
 # def create_project(request):
