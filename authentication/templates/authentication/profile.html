@@ -1,5 +1,5 @@
 {% extends 'layouts/base.html' %}
-{% load static %}
+{% load static %} 
 {% block 'content' %}
 
 <div class="container mt-5">
@@ -7,24 +7,34 @@
     <div class="col-md-8">
       <div class="card">
         <div class="card-header bg-info text-white">
-          <h1 class="card-title" style="font-size: 2rem;">User Profile</h1>
+          <h1 class="card-title text-center" style="font-size: 2rem; text-align: justify">User Profile</h1>
         </div>
         <div class="card-body">
-        <!-- STILL WORKING ON IT -->
-          <div class="text-center mb-4">
-            <img src="{{user.image_url}}" style="width: 250px; height: 350px;" class="card-img-top" alt="...">
+          <div class="profile-picture text-center mb-4">
+            <img
+              src="{{ user.image_url }}"
+              class="img-fluid rounded-circle"
+              style="width: 150px; height: 150px"
+              alt="Profile Picture"
+            />
           </div>
-        <!-- STILL WORKING ON IT -->
-          <h4 class="card-title" style="font-size: 1.5rem;">{{ user.first_name }} {{ user.last_name }}</h4>
-          <hr class="my-4">
-          <p class="card-text"><b>Email:</b> {{ user.email }}</p>
-          <p class="card-text"><b>Phone:</b> {{ user.mobile_phone }}</p>
-          <p class="card-text"><b>Birthdate:</b> {{ user.birthdate }}</p>
-          <p class="card-text"><b>Facebook Profile:</b> <a href="{{ user.facebook_profile }}">{{ user.facebook_profile }}</a></p>
-          <p class="card-text"><b>Country:</b> {{ user.country }}</p>
-          <div class="mt-4">
+          <h4 class="card-title text-center" style="font-size: 1.5rem">
+            {{ user.first_name }} {{ user.last_name }}
+          </h4>
+          <hr class="my-4" />
+          <div class="profile-details">
+            <p><b>Email:</b> {{ user.email }}</p>
+            <p><b>Phone:</b> {{ user.mobile_phone }}</p>
+            <p><b>Birthdate:</b> {{ user.birthdate }}</p>
+            <p>
+              <b>Facebook Profile:</b>
+              <a href="{{ user.facebook_profile }}">{{ user.facebook_profile }}</a>
+            </p>
+            <p><b>Country:</b> {{ user.country }}</p>
+          </div>
+          <div class="text-center mt-4">
             <a href="{% url 'edit.profile' user.id %}" class="btn btn-info">Edit Profile</a>
-            <a href="{% url 'delete.account' user.id %}" class="btn btn-danger">Delete Account</a>
+            <a href="{% url 'delete.account' user.id %}" class="btn btn-danger">Delete Profile</a>
           </div>
         </div>
       </div>
@@ -32,5 +42,19 @@
   </div>
 </div>
 
-<script src="{% static 'authentication/js/script.js'%}"></script>
+<style>
+  .profile-picture img {
+    border: 5px solid #ffffff;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.4);
+  }
+
+  .profile-details p {
+    font-size: 1.1rem;
+  }
+  
+  .card-title {
+    margin-bottom: 0.5rem;
+  }
+</style>
+
 {% endblock %}

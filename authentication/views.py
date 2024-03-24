@@ -37,11 +37,7 @@ def edit_profile(request, id):
             form.save()
             return redirect('view.profile', id=id)
     else:
-        # Exclude the email field from the form
-        # Set initial value for password field to an empty string
         form = UserModelForm(instance=user)
-        # form.fields['email'].disabled = True
-        # form.initial['password'] = '' 
     return render(request, 'authentication/edit_profile.html', {'form': form, 'id': id})
 
 
@@ -51,6 +47,3 @@ def delete_account(request, id):
         user.delete()
         return redirect('landing') 
     return render(request, 'authentication/delete_account.html', {'user': user})
-
-
-
