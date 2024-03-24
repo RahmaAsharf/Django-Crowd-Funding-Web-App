@@ -1,6 +1,6 @@
 from django import forms
 from projects.models import Project, Image
-from .models import Tag, Category, Rating
+from .models import Donation, Tag, Category, Rating
 from django.core.exceptions import ValidationError
 
 # class ProjectForm(forms.ModelForm):
@@ -16,6 +16,12 @@ class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
         fields = '__all__'
+        
+    # def clean_totalDonated(self):
+    #     total= self.cleaned_data.get('total')
+    #     if self.instance and self.instance.totalDonate > total:
+    #         raise forms.ValidationError("this exceed total donatetd")
+
         
 class MultipleClearableFileInput(forms.ClearableFileInput):
     def __init__(self, attrs=None):
@@ -35,6 +41,16 @@ class RatingForm(forms.ModelForm):
     class Meta:
         model = Rating
         fields = ['comment', 'rating']
+        
+class DonationForm(forms.ModelForm):
+    class Meta:
+        model = Donation
+        fields = ['amount']
+    def clean_amount(self):
+        amount= self.cleaned_data['amount']
+        if amount < 0:
+             raise forms.ValidationError("amount must be an integer number")
+        return amount
 
     # def clean(self):
     #     cleaned_data = super().clean()

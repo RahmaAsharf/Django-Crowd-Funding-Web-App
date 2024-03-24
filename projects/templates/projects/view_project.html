@@ -21,10 +21,11 @@
                         {% endfor %}
                     </ul>
                     <p class="card-text">Average Review: {{ project.averageReview }}</p>
+                    <p class="card-text">Total Donated: {{ project.totalDonate }}</p>
                     <div class="text-center mt-3">
                         <a href="#" class="btn btn-primary btn-comment">Comment</a>
                         <a href="{% url 'add_commentorrate' project.id %}" class="btn btn-success btn-donate">Rate</a>
-                        <a href="#" class="btn btn-success btn-donate">Donate</a>
+                        <a href="{% url 'donate' project.id %}" class="btn btn-success btn-donate">Donate</a>
                     </div>
                 </div>
                 <div class="card-footer">
