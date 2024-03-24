@@ -1,0 +1,15 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block 'content' %}
+<title>Donate</title>
+
+<body>
+    <h1>Your Donation</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form }}
+        <button type="submit">Submit</button>
+    </form>
+</body>
+
+{% endblock %}

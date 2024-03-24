@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from projects.models import Project, Image, Tag, Category, Rating
-from projects.forms import ProjectForm, ImageForm, RatingForm
+from projects.forms import DonationForm, ProjectForm, ImageForm, RatingForm
 
 def create_project(request):
     if request.method == "POST":
@@ -44,6 +44,19 @@ def add_commentorrate(request, id):
         form = RatingForm()
     return render(request, 'projects/rate.html', {'form': form})
    
+
+def donate(request, id):
+    if request.method == 'POST':
+        form = DonationForm(request.POST)
+        if form.is_valid():
+            data = form.save(commit=False)
+            data.project_id = id
+            data.user_id = 1  # Assuming user_id is hardcoded for testing
+            data.save()
+            return redirect('view_projects')
+    else:
+        form = DonationForm()
+    return render(request, 'projects/donate.html', {'form': form}) 
 
 
 # def create_project(request):
