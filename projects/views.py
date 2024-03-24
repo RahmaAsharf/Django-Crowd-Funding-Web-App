@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from projects.models import Project, Image, Tag, Category
-from projects.forms import ProjectForm, ImageForm
+from projects.models import Project, Image, Tag, Category, Rating
+from projects.forms import ProjectForm, ImageForm, RatingForm
 
 def create_project(request):
     if request.method == "POST":
@@ -29,6 +29,21 @@ def view_projects(request):
     print (all_projects)
     return render(request, 'projects/view_project.html', context={"Projects": all_projects})
 
+
+def add_commentorrate(request, id):
+    if request.method == 'POST':
+        form = RatingForm(request.POST)
+        if form.is_valid():
+            data = form.save(commit=False)
+            data.project_id = id
+            data.user_id = 1
+            #data.user_id = request.user.id
+            data.save()
+            return redirect('view_projects')  
+    else:
+        form = RatingForm()
+    return render(request, 'projects/rate.html', {'form': form})
+   
 
 
 # def create_project(request):

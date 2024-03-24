@@ -20,9 +20,10 @@
                         <li>{{ tag.name }}</li>
                         {% endfor %}
                     </ul>
+                    <p class="card-text">Average Review: {{ project.averageReview }}</p>
                     <div class="text-center mt-3">
                         <a href="#" class="btn btn-primary btn-comment">Comment</a>
-                        <a href="#" class="btn btn-secondary btn-rate">Rate</a>
+                        <a href="{% url 'add_commentorrate' project.id %}" class="btn btn-success btn-donate">Rate</a>
                         <a href="#" class="btn btn-success btn-donate">Donate</a>
                     </div>
                 </div>
