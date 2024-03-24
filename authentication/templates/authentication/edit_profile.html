@@ -12,7 +12,15 @@
         <div class="card-body">
           <form method="post" enctype="multipart/form-data" class="p-5">
             {% csrf_token %}
-            {{ form.as_p }}
+            {% for field in form %}
+              <div class="form-group">
+                {{ field.label_tag }}
+                {{ field }}
+                {% for error in field.errors %}
+                  <p class="alert alert-danger">{{ error }}</p>
+                {% endfor %}
+              </div>
+            {% endfor %}
             <button type="submit" class="btn btn-info">Save Changes</button>
             <a href="{% url 'view.profile' id %}" class="btn btn-secondary">Back to Profile</a>
           </form>
@@ -21,6 +29,7 @@
     </div>
   </div>
 </div>
+
 <script src="{% static 'authentication/js/script.js'%}"></script>
 
 <style>

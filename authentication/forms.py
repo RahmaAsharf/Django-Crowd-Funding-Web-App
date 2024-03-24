@@ -40,7 +40,8 @@ class UserModelForm(forms.ModelForm):
         # Check if the instance is an existing user or not
         if self.instance.pk:
             old_password = CustomUser.objects.get(pk=self.instance.pk).password
-            if check_password(password, old_password):
+            # Check if the password has been changed
+            if password and check_password(password, old_password):
                 raise forms.ValidationError("New password can't be same as old password")
         return password
     
