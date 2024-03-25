@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
-from authentication.forms import  UserModelForm, CustomUser
+from authentication.forms import  UserModelForm, UserProfileForm, CustomUser
 
 
 # Create your views here.
@@ -32,14 +32,14 @@ def view_profile(request, id):
 def edit_profile(request, id):
     user = get_object_or_404(CustomUser, pk=id)
     if request.method == 'POST':
-        form = UserModelForm(request.POST, request.FILES, instance=user)
+        form = UserProfileForm(request.POST, request.FILES, instance=user)
         if form.is_valid():
             form.save()
             return redirect('view.profile', id=id)
     else:
         # form = UserModelForm(instance=user)
         # Set initial password field to empty string when editing profile
-        form = UserModelForm(instance=user, initial={'password': ''}) 
+        form = UserProfileForm(instance=user, initial={'password': ''}) 
     return render(request, 'authentication/edit_profile.html', {'form': form, 'id': id})
 
 

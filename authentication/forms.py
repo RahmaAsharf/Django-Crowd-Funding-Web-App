@@ -8,10 +8,36 @@ class UserModelForm(forms.ModelForm):
     class Meta:
         model  = CustomUser
         # fields = '__all__'
-        # Retreive all form data except email field 
+        exclude = ['birthdate','facebook_profile','country'] 
+        widgets = {
+            'password': forms.PasswordInput(),
+        }
+
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError("User already exists")
+        return email
+
+    def clean_mobile_phone(self):
+        mobile_phone = self.cleaned_data['mobile_phone']
+        if not mobile_phone.startswith('01') or len(mobile_phone) != 11:
+            raise forms.ValidationError("Please enter a valid Egyptian phone number")
+        return mobile_phone
+    
+    def save(self, commit=True):
+        self.instance.password = make_password(password=self.instance.password)
+        super().save()
+        return self.instance
+
+
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model  = CustomUser
+        # Retreive all form data except email field
         exclude = ['email']
         widgets = {
-            'password': forms.PasswordInput(render_value=True),
+            'password': forms.PasswordInput(),
         }
 
     # called when creating an instance of form
@@ -22,12 +48,6 @@ class UserModelForm(forms.ModelForm):
             self.fields['password'].required = False # password is not required
         else:
             self.fields['password'].required = True # password is required
-
-    def clean_email(self):
-        email = self.cleaned_data['email']
-        if User.objects.filter(email=email).exists():
-            raise forms.ValidationError("User already exists")
-        return email
 
     def clean_mobile_phone(self):
         mobile_phone = self.cleaned_data['mobile_phone']
@@ -49,3 +69,4 @@ class UserModelForm(forms.ModelForm):
         self.instance.password = make_password(password=self.instance.password)
         super().save()
         return self.instance
+    
