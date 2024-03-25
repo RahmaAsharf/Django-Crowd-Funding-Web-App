@@ -2,6 +2,7 @@ from django import forms
 from projects.models import Project, Image
 from .models import Donation, Tag, Category, Rating
 from django.core.exceptions import ValidationError
+from django.shortcuts import get_object_or_404
 
 # class ProjectForm(forms.ModelForm):
 #     class Meta:
@@ -15,12 +16,8 @@ class ProjectForm(forms.ModelForm):
 
     class Meta:
         model = Project
-        fields = '__all__'
-        
-    # def clean_totalDonated(self):
-    #     total= self.cleaned_data.get('total')
-    #     if self.instance and self.instance.totalDonate > total:
-    #         raise forms.ValidationError("this exceed total donatetd")
+        # fields = '__all__'
+        fields = ['title', 'details', 'category', 'total', 'startDate', 'endDate', 'tags']
 
         
 class MultipleClearableFileInput(forms.ClearableFileInput):
@@ -46,10 +43,20 @@ class DonationForm(forms.ModelForm):
     class Meta:
         model = Donation
         fields = ['amount']
+
+    def __init__(self, *args, **kwargs):
+        self.project_id = kwargs.pop('project_id', None)
+        super().__init__(*args, **kwargs)
+
     def clean_amount(self):
-        amount= self.cleaned_data['amount']
-        if amount < 0:
-             raise forms.ValidationError("amount must be an integer number")
+        amount = self.cleaned_data['amount']
+        if amount <= 0:
+            raise forms.ValidationError("Amount must be greater than 0.")
+        if self.project_id:
+            project = get_object_or_404(Project, pk=self.project_id)
+            total_donated = project.totalDonate()
+            if amount+total_donated > project.total:
+                raise forms.ValidationError("Donation amount exceeds project's funding goal.")
         return amount
 
     # def clean(self):
