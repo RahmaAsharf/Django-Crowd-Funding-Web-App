@@ -96,6 +96,13 @@ def donate(request, id):
             donation.user_id = 1
             donation.save()
             return redirect('project_page', id=id)
+        else:
+            # Form validation failed, re-render context with errors
+            context = {
+                'project': project,
+                'donation_form': donation_form,
+            }
+            return render(request, 'projects/project_page.html', context)
     else:
         donation_form = DonationForm()
     context = {

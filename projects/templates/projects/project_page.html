@@ -25,18 +25,35 @@
                     <div class="text-center mt-3">
                         <a href="#" class="btn btn-primary btn-comment">Comment</a>
                         <a href="{% url 'add_commentorrate' project.id %}" class="btn btn-success btn-donate">Rate</a>
-
+                        <br><br>
                         {% if project.total > project.totalDonate  %}
-                            <button class="btn btn-success btn-donate" onclick="toggleDonateForm()" >Donate </button>
+                        {% if donation_form.errors %}
+                            <div >
+                                <ul>
+                                    {% for field, errors in donation_form.errors.items %}
+                                        {% for error in errors %}
+                                            {% if error != "This field is required." %}
+                                                <li class="alert alert-danger" >{{ field }}: {{ error }}</li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                        
+                            <div id="donatecontainer">
+                            <form method="post" action="{% url 'donate' id=project.id %}">
+                                {% csrf_token %}
+                                {{ donation_form.amount}} 
+                                <button type="submit" class="btn btn-primary">Donate</button>
+                            </form>
+                            </div>
                             <br><br>
-                                <div id="donatecontainer" style="display: none;">
-                                    <form method="post" action="{% url 'donate' id=project.id %}">
-                                        {% csrf_token %}
-                                        {{ donation_form.as_p }}
-                                        <button type="submit" class="btn btn-primary">Add</button>
-                                    </form>
+                            <div class="progress">
+                                <div id="donate-progress" class="progress-bar progress-bar-striped active" role="progressbar"
+                                    aria-valuenow="{{ project.totalDonate }}" aria-valuemin="0" aria-valuemax="{{ project.total }}">
                                 </div>
-
+                            </div>
                         {% endif %}
                         <br><br>
                         <a href="{% url 'view_projects' %}" class="btn btn-success btn-donate">Back to all projects</a>
@@ -81,22 +98,26 @@
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-    <script>
-    
-    function toggleDonateForm() {
-        var x = document.getElementById("donatecontainer");
-        if (x.style.display === "none" || x.style.display === "") {
-            x.style.display = "block";
-        } else {
-            // Check if there are any errors in the form submission
-            var errors = document.querySelectorAll('.errorlist');
-            if (errors.length === 0) {
-                x.style.display = "none";
-            }
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Function to update progress bar width
+        function updateProgressBar() {
+            var totalDonate = parseInt("{{ project.totalDonate }}");
+            var totalTarget = parseInt("{{ project.total }}");
+            var donationProgress = (totalDonate / totalTarget) * 100;
+
+            // Update progress bar width and text
+            $("#donate-progress").css("width", donationProgress + "%");
+            $("#donate-progress").attr("aria-valuenow", donationProgress);
+            $("#donate-progress").text(totalDonate + " of " + totalTarget );
         }
-    }
+
+        // Call the function initially
+        updateProgressBar();
+        $(document).on('change', function() {
+            updateProgressBar();
+        });
+    });
 </script>
-
-
-        </script>
 {% endblock %}  
