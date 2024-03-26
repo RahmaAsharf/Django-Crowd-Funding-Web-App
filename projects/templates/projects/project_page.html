@@ -1,7 +1,8 @@
-{% extends 'layouts/base.html' %}
+{% extends 'layouts/projects/base.html' %}
 {% load static %}
-
 {% block 'content' %}
+
+
     <h1 class="text-center mb-4">{{ project.title }} Page</h1>
     <div class="row">
         <div class="col-md-4 mb-4">
@@ -23,7 +24,9 @@
                     <p class="card-text">Total Donated: {{ project.totalDonate }}</p>
                     <div class="text-center mt-3">
                         <a href="#" class="btn btn-primary btn-comment">Comment</a>
-                        <a href="{% url 'add_commentorrate' project.id %}" class="btn btn-success btn-donate">Rate</a>
+                        
+                        <a href="#" class="btn btn-success btn-donate">Rate</a>
+
                         <a href="{% url 'donate' project.id %}" class="btn btn-success btn-donate">Donate</a>
                         <br><br>
                         <a href="{% url 'view_projects' %}" class="btn btn-success btn-donate">Back to all projects</a>
@@ -48,4 +51,29 @@
         </div>
         {% endfor %}
     </div>
+    <form action="{% url 'submit_review' project.id %}" method="POST">
+        {% csrf_token %}
+        <h5>Write Your Review</h5>
+        <div>
+            <!-- Rating stars -->
+            <label>How do you rate this product?</label>
+            <br>
+            <div class="rate">
+                <input type="radio" name="rating" id="rating10" value="5" required /><label for="rating10" title="5"></label>
+                <input type="radio" name="rating" id="rating9" value="4.5" required /><label for="rating9" title="4.5" class="half"></label>
+                <input type="radio" name="rating" id="rating8" value="4" required /><label for="rating8" title="4"></label>
+                <input type="radio" name="rating" id="rating7" value="3.5" required /><label for="rating7" title="3.5" class="half"></label>
+                <input type="radio" name="rating" id="rating6" value="3" required /><label for="rating6" title="3"></label>
+                <input type="radio" name="rating" id="rating5" value="2.5" required /><label for="rating5" title="2.5" class="half"></label>
+                <input type="radio" name="rating" id="rating4" value="2" required /><label for="rating4" title="2"></label>
+                <input type="radio" name="rating" id="rating3" value="1.5" required /><label for="rating3" title="1.5" class="half"></label>
+                <input type="radio" name="rating" id="rating2" value="1" required /><label for="rating2" title="1"></label>
+                <input type="radio" name="rating" id="rating1" value="0.5" required /><label for="rating1" title="0.5" class="half"></label>
+            </div>
+            <br>
+
+            <input type="submit" value="Submit Review" class="btn btn-primary">
+        </div>
+    </form>
+
 {% endblock %}

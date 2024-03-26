@@ -42,8 +42,10 @@ class ImageForm(forms.ModelForm):
 class RatingForm(forms.ModelForm):
     class Meta:
         model = Rating
-        fields = ['comment', 'rating']
+        fields = [ 'rating']
         
+
+
 class DonationForm(forms.ModelForm):
     class Meta:
         model = Donation

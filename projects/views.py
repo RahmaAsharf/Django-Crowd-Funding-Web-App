@@ -71,20 +71,34 @@ def delete_project(request, id):
 
 
 
+# def add_commentorrate(request, project_id):
+#     if request.method == 'POST':
+#         form = RatingForm(request.POST)
+#         if form.is_valid():
+#             data = form.save(commit=False)
+#             data.project_id = project_id
+#             data.user_id = 1
+#             #data.user_id = request.user.id
+#             data.save()
+#             return redirect('project_page', id=project_id) 
+#     else:
+#         form = RatingForm()
+#     return render(request, 'projects/rate.html', {'form': form ,'project_id': project_id})
 
-def add_commentorrate(request, id):
+
+def submit_review(request, project_id):
+    url = request.META.get('HTTP_REFERER')
     if request.method == 'POST':
         form = RatingForm(request.POST)
         if form.is_valid():
             data = form.save(commit=False)
-            data.project_id = id
+            data.project_id = project_id
             data.user_id = 1
-            #data.user_id = request.user.id
             data.save()
-            return redirect('project_page', id=id) 
-    else:
-        form = RatingForm()
-    return render(request, 'projects/rate.html', {'form': form})
+            return HttpResponse('Thank you! Your review has been submitted.')
+
+
+
    
 
 def donate(request, id):
