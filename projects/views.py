@@ -33,6 +33,8 @@ def view_projects(request):
 
 def project_page(request, id):
     project = Project.objects.get(id=id)
+    projects = Project.objects.all()
+
     can_delete = False
     
     # Check if the current user is the creator of the project
@@ -43,8 +45,24 @@ def project_page(request, id):
         # Check if donations are less than 25% of the total value
         if project.totalDonate() < quarter_total:
             can_delete = True
+
+    matching_projects = []
+    unique_project_ids = set()
+
+    for mytag in project.tags.all():
+        for pro in projects:
+            flag = False
+            for tag in pro.tags.all():
+                if flag == False:
+                    if pro.id != project.id and mytag.name == tag.name:
+                        flag = True
+                        if pro.id not in unique_project_ids:
+                            matching_projects.append(pro)
+                            unique_project_ids.add(pro.id)
+                        
+                        break  # Break out of the inner loop
             
-    return render(request, 'projects/project_page.html', {'project': project, 'can_delete': can_delete})
+    return render(request, 'projects/project_page.html', {'project': project, 'can_delete': can_delete , 'matching_projects': matching_projects})
 
 # def delete_conditions(request, id):
 #     project = Project.objects.get(id=id)

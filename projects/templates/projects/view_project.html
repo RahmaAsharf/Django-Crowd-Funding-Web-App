@@ -12,8 +12,6 @@
                     <h2 class="card-title">{{ project.title }}</h2>
                     <p class="card-text">{{ project.details }}</p>
                     <p class="card-text">Total: {{ project.total }}</p>
-                    <p class="card-text">Start Date: {{ project.startDate }}</p>
-                    <p class="card-text">End Date: {{ project.endDate }}</p>
                     <p class="card-text">Category: {{ project.category.name }}</p>
                     <h3>Tags:</h3>
                     <ul class="list-unstyled">
@@ -29,7 +27,6 @@
                 </div>
 
                 <div class="card-footer">
-                    <h3>Images:</h3>
                     <div id="carousel-{{ project.id }}" class="carousel slide" data-ride="carousel">
                         <!-- Indicators -->
                         <ol class="carousel-indicators">
