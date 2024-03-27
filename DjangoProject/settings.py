@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'authentication.apps.AuthenticationConfig',
 ]
 
 MIDDLEWARE = [
@@ -54,7 +55,7 @@ ROOT_URLCONF = 'DjangoProject.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR/'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -126,3 +127,22 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # Replace 'smtp.example.com' with your SMTP server address
+EMAIL_PORT = 587  # Replace with your SMTP port (587 for TLS, 465 for SSL)
+EMAIL_USE_TLS = True  # Set to True if your SMTP server uses TLS, False otherwise
+EMAIL_HOST_USER = 'guihadyosry@gmail.com'  # Replace with your email address
+EMAIL_HOST_PASSWORD = 'gsus fgmh qfrd egyw'  # Replace with your email password
+DEFAULT_FROM_EMAIL = 'guihadyosry@gmail.com'  # Replace with the default sender email address
+
+
+
+
+DOMAIN = 'http://127.0.0.1:8000'  
+
+
+AUTH_USER_MODEL = 'authentication.CustomUser'
+

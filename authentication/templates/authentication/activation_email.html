@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Activate Your Account</title>
+</head>
+<body>
+    <p>Hi {{ user.first_name }},</p>
+    <p>Click the following link to activate your account:</p>
+    <!-- <p><a href="{{ activate_account }}">Activate Account</a></p> -->
+    <p><a href="{% url 'activate_account' activation_key=user.activation_key%}">Activate Account</a></p>
+</body>
+</html>
