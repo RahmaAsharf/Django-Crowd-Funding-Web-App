@@ -21,7 +21,6 @@ def create_project(request):
                 new_file = Image(project=project, file=file)
                 new_file.save()
                 file_urls.append(new_file.file.url)
-
             form.save_m2m()
             return redirect('view_projects')
     else:
