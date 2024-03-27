@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from projects.models import Project, Image, Tag, Category, Rating, Report
 from projects.forms import DonationForm, ProjectForm, ImageForm, RatingForm , ReportForm
 from decimal import Decimal
+from django.utils import timezone
 
 def create_project(request):
     if request.method == "POST":
@@ -116,13 +117,28 @@ def donate(request, id):
             donation.user_id = 1
             donation.save()
             return redirect('project_page', id=id)
+        else:
+            # Form validation failed, re-render context with errors
+            context = {
+                'project': project,
+                'donation_form': donation_form,
+            }
+            return render(request, 'projects/project_page.html', context)
     else:
         donation_form = DonationForm()
     context = {
         'project': project,
         'donation_form': donation_form,
     }
-    return render(request, 'projects/project_page.html', context)      
+    return render(request, 'projects/project_page.html', context)   
+def top_projects(request):
+
+    today = timezone.now().date()
+    running_projects = Project.objects.filter(startDate__lte=today,endDate__gte=today)
+    print(running_projects)
+    sorted_projects = sorted(running_projects, key=lambda x: x.averageReview(), reverse=True)[:2]
+    return render(request, 'projects/home.html', {'top_projects': sorted_projects})
+      
 
 def report_project(request, id):
     if request.method == 'POST':
