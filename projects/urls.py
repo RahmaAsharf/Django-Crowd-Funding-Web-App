@@ -1,5 +1,5 @@
 from django.urls import path
-from projects.views import create_project, view_projects, donate, delete_project, project_page, add_rate, add_comment
+from projects.views import create_project,view_projects,donate, delete_project,project_page,top_projects, project_page, add_rate, add_comment
 
 urlpatterns = [
     # path('try', try1)
@@ -10,7 +10,7 @@ urlpatterns = [
     path('donate/<int:id>', donate , name="donate"),
     path('delete/<int:id>', delete_project, name='delete_project'),
     path('view/<int:id>', project_page, name="project_page"),
-
+    path('home', top_projects, name="top_projects"),
 
 
 ]

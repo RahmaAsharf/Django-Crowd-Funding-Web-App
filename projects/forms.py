@@ -66,4 +66,5 @@ class DonationForm(forms.ModelForm):
             if amount+total_donated > project.total:
                 raise forms.ValidationError("Donation amount exceeds project's funding goal.")
         return amount
+    
 
