@@ -20,6 +20,18 @@ class ProjectForm(forms.ModelForm):
         fields = ['title', 'details', 'category', 'total', 'startDate', 'endDate', 'tags']
 
         
+    # def clean_totalDonated(self):
+    #     total= self.cleaned_data.get('total')
+    #     if self.instance and self.instance.totalDonate > total:
+    #         raise forms.ValidationError("this exceed total donatetd")
+
+        
+    # def clean_totalDonated(self):
+    #     total= self.cleaned_data.get('total')
+    #     if self.instance and self.instance.totalDonate > total:
+    #         raise forms.ValidationError("this exceed total donatetd")
+
+        
 class MultipleClearableFileInput(forms.ClearableFileInput):
     def __init__(self, attrs=None):
         super().__init__(attrs)

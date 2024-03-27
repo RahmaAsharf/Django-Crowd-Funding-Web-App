@@ -3,6 +3,8 @@ from django.http import HttpResponse
 from projects.models import Project, Image, Tag, Category, Rating
 from projects.forms import DonationForm, ProjectForm, ImageForm, RatingForm
 from decimal import Decimal
+from django.utils import timezone
+
 
 def create_project(request):
     if request.method == "POST":
@@ -33,6 +35,8 @@ def view_projects(request):
 
 def project_page(request, id):
     project = Project.objects.get(id=id)
+    projects = Project.objects.all()
+
     can_delete = False
     
     # Check if the current user is the creator of the project
@@ -43,8 +47,24 @@ def project_page(request, id):
         # Check if donations are less than 25% of the total value
         if project.totalDonate() < quarter_total:
             can_delete = True
+
+    matching_projects = []
+    unique_project_ids = set()
+
+    for mytag in project.tags.all():
+        for pro in projects:
+            flag = False
+            for tag in pro.tags.all():
+                if flag == False:
+                    if pro.id != project.id and mytag.name == tag.name:
+                        flag = True
+                        if pro.id not in unique_project_ids:
+                            matching_projects.append(pro)
+                            unique_project_ids.add(pro.id)
+                        
+                        break  # Break out of the inner loop
             
-    return render(request, 'projects/project_page.html', {'project': project, 'can_delete': can_delete})
+    return render(request, 'projects/project_page.html', {'project': project, 'can_delete': can_delete , 'matching_projects': matching_projects})
 
 # def delete_conditions(request, id):
 #     project = Project.objects.get(id=id)
@@ -111,18 +131,13 @@ def donate(request, id):
     }
     return render(request, 'projects/project_page.html', context)            
 
-# def donate(request, id):
-#     if request.method == 'POST':
-#         form = DonationForm(request.POST)
-#         if form.is_valid():
-#             data = form.save(commit=False)
-#             data.project_id = id
-#             data.user_id = 1  # Assuming user_id is hardcoded for testing
-#             data.save()
-#             return redirect('project_page', id=id)
-#     else:
-#         form = DonationForm()
-#         return render(request, 'projects/donate.html', {'form': form}) 
+def top_projects(request):
+
+    today = timezone.now().date()
+    running_projects = Project.objects.filter(startDate__lte=today,endDate__gte=today)
+    print(running_projects)
+    sorted_projects = sorted(running_projects, key=lambda x: x.averageReview(), reverse=True)[:2]
+    return render(request, 'projects/home.html', {'top_projects': sorted_projects})
 
 
 # def create_project(request):
