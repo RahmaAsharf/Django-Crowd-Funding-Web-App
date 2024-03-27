@@ -8,6 +8,10 @@
         <div class="col-md-4 mb-4">
             <div class="card">
                 <div class="card-body">
+                    {% if project.user_id == 1 %}
+                    <h2 class="card-title" style="color: red;">project has {{ report_count }} reports</h2>
+                    <a href="{% url 'view_reports' project.id %}" class="btn btn-success btn-donate">View reports</a>
+                    {% endif %}
                     <h2 class="card-title">{{ project.title }}</h2>
                     <p class="card-text">{{ project.details }}</p>
                     <p class="card-text">Total: {{ project.total }}</p>
@@ -40,6 +44,8 @@
                         {% endif %}
                         <br><br>
                         <a href="{% url 'view_projects' %}" class="btn btn-success btn-donate">Back to all projects</a>
+                        <a href="{% url 'report_project' project.id  %}" class="btn btn-success btn-donate ">Report</a>
+
                     </div>
                 </div>
                 {% if can_delete %}

@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect , get_object_or_404
 from django.http import HttpResponse
-from projects.models import Project, Image, Tag, Category, Rating
-from projects.forms import DonationForm, ProjectForm, ImageForm, RatingForm
+from projects.models import Project, Image, Tag, Category, Rating, Report
+from projects.forms import DonationForm, ProjectForm, ImageForm, RatingForm , ReportForm
 from decimal import Decimal
 
 def create_project(request):
@@ -34,6 +34,8 @@ def view_projects(request):
 def project_page(request, id):
     project = Project.objects.get(id=id)
     projects = Project.objects.all()
+    report_count = Report.objects.filter(project_id=id).count()
+    
 
     can_delete = False
     
@@ -62,7 +64,7 @@ def project_page(request, id):
                         
                         break  # Break out of the inner loop
             
-    return render(request, 'projects/project_page.html', {'project': project, 'can_delete': can_delete , 'matching_projects': matching_projects})
+    return render(request, 'projects/project_page.html', {'project': project, 'can_delete': can_delete , 'matching_projects': matching_projects , 'report_count':report_count })
 
 # def delete_conditions(request, id):
 #     project = Project.objects.get(id=id)
@@ -120,7 +122,28 @@ def donate(request, id):
         'project': project,
         'donation_form': donation_form,
     }
-    return render(request, 'projects/project_page.html', context)            
+    return render(request, 'projects/project_page.html', context)      
+
+def report_project(request, id):
+    if request.method == 'POST':
+        form = ReportForm(request.POST)
+        if form.is_valid():
+            report = form.save(commit=False)
+            report.project_id = id
+            # report.user = request.user  # Assuming the user is logged in
+            report.user_id = 1
+            report.save()
+            return redirect('project_page', id=id)  # Redirect to the project detail page
+    else:
+        form = ReportForm()
+    
+    return render(request, 'projects/report.html', {'form': form})  
+
+def view_all_reports(request, id):
+    # Retrieve all reports for the specified project ID
+    
+    all_reports = Report.objects.filter(project_id=id)
+    return render(request, 'projects/view_reports.html', {'all_reports': all_reports , "id":id })
 
 # def donate(request, id):
 #     if request.method == 'POST':

@@ -1,6 +1,6 @@
 from django import forms
 from projects.models import Project, Image
-from .models import Donation, Tag, Category, Rating
+from .models import Donation, Tag, Category, Rating , Report
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 
@@ -70,6 +70,18 @@ class DonationForm(forms.ModelForm):
             if amount+total_donated > project.total:
                 raise forms.ValidationError("Donation amount exceeds project's funding goal.")
         return amount
+
+
+class ReportForm(forms.ModelForm):
+    status_ = (('Hateful Speech','Hateful Speech'),('Profanity', 'Profanity'),
+                ('Abuse', 'Abuse'),('Violence','Violence'),
+                ('Irrelevant','Irrelevant'))
+
+    status = forms.ChoiceField(choices=status_)
+
+    class Meta:
+        model = Report
+        fields = ['reason','status']
 
     # def clean(self):
     #     cleaned_data = super().clean()
