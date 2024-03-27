@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('authentication', '0002_customuser_birthdate_customuser_country_and_more'),
+        ('authentication', '0001_initial'),
     ]
 
     operations = [

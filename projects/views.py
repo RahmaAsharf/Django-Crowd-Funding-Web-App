@@ -1,30 +1,35 @@
-from django.shortcuts import render, redirect , reverse 
+from django.shortcuts import render, redirect , get_object_or_404
 from django.http import HttpResponse
-from projects.models import Project, Image, Tag, Category, Rating
-from projects.forms import DonationForm, ProjectForm, ImageForm, RatingForm
+from projects.models import Project,Image, Tag, Category, Rating
+from projects.forms import DonationForm, ProjectForm, RatingForm, CommentForm
 from decimal import Decimal
 
 def create_project(request):
     if request.method == "POST":
         form = ProjectForm(request.POST)
-        files = request.FILES.getlist("image")
+        files = request.FILES.getlist("files")
+        file_urls = []
+
         if form.is_valid():
             project = form.save(commit=False)
-            # project.user = request.user
-            project.user_id = 1
+            project.user_id = 1  # Assuming user_id needs to be set to 1
             project.save()
+
             for file in files:
-                Image.objects.create(project=project, image=file)
+                new_file = Image(project=project, file=file)
+                new_file.save()
+                file_urls.append(new_file.file.url)
+
             form.save_m2m()  # Save many-to-many relationships
-            return redirect(form.instance.show_url)
+            # Redirect to project_view with project_id as a parameter
+            return redirect('view_projects')
     else:
         form = ProjectForm()
-        image_form = ImageForm()
     
     tags = Tag.objects.all()
     categories = Category.objects.all()
 
-    return render(request, "projects/create_project.html", {"form": form, "imageform": image_form, "tags": tags, "categories": categories})
+    return render(request, "projects/create_project.html", {"form": form, "tags": tags, "categories": categories})
 
 def view_projects(request):
     all_projects = Project.objects.all()
@@ -33,6 +38,8 @@ def view_projects(request):
 
 def project_page(request, id):
     project = Project.objects.get(id=id)
+    projects = Project.objects.all()
+
     can_delete = False
     
     # Check if the current user is the creator of the project
@@ -43,8 +50,24 @@ def project_page(request, id):
         # Check if donations are less than 25% of the total value
         if project.totalDonate() < quarter_total:
             can_delete = True
+
+    matching_projects = []
+    unique_project_ids = set()
+
+    for mytag in project.tags.all():
+        for pro in projects:
+            flag = False
+            for tag in pro.tags.all():
+                if flag == False:
+                    if pro.id != project.id and mytag.name == tag.name:
+                        flag = True
+                        if pro.id not in unique_project_ids:
+                            matching_projects.append(pro)
+                            unique_project_ids.add(pro.id)
+                        
+                        break  # Break out of the inner loop
             
-    return render(request, 'projects/project_page.html', {'project': project, 'can_delete': can_delete})
+    return render(request, 'projects/project_page.html', {'project': project, 'can_delete': can_delete , 'matching_projects': matching_projects})
 
 # def delete_conditions(request, id):
 #     project = Project.objects.get(id=id)
@@ -69,104 +92,58 @@ def delete_project(request, id):
        
     return render(request, 'projects/delete.html', {'project': project})
 
-
-
-# def add_commentorrate(request, project_id):
-#     if request.method == 'POST':
-#         form = RatingForm(request.POST)
-#         if form.is_valid():
-#             data = form.save(commit=False)
-#             data.project_id = project_id
-#             data.user_id = 1
-#             #data.user_id = request.user.id
-#             data.save()
-#             return redirect('project_page', id=project_id) 
-#     else:
-#         form = RatingForm()
-#     return render(request, 'projects/rate.html', {'form': form ,'project_id': project_id})
-
-
-def submit_review(request, project_id):
+        
+def add_rate(request, project_id):
     url = request.META.get('HTTP_REFERER')
     if request.method == 'POST':
         form = RatingForm(request.POST)
         if form.is_valid():
             data = form.save(commit=False)
             data.project_id = project_id
-            data.user_id = 1
+            #data.user_id = request.user.id
+            data.user_id = 1  
             data.save()
-            return HttpResponse('Thank you! Your review has been submitted.')
+            return redirect(url)
+        # error retuen
+    return redirect(url)
 
-
-
-   
-
-def donate(request, id):
+def add_comment(request, project_id):
+    url = request.META.get('HTTP_REFERER')
     if request.method == 'POST':
-        form = DonationForm(request.POST)
+        form = CommentForm(request.POST)
         if form.is_valid():
             data = form.save(commit=False)
-            data.project_id = id
-            data.user_id = 1  # Assuming user_id is hardcoded for testing
+            data.project_id = project_id
+            #data.user_id = request.user.id
+            data.user_id = 1  
             data.save()
+            return redirect(url)
+        # error retuen
+    return redirect(url)
+
+def donate(request, id):
+    project = get_object_or_404(Project, pk=id)
+    if request.method == 'POST':
+        donation_form = DonationForm(request.POST,project_id=id)
+        if donation_form.is_valid():
+            donation = donation_form.save(commit=False)
+            donation.project_id = id
+            #data.user_id = request.user.id
+            donation.user_id = 1
+            donation.save()
             return redirect('project_page', id=id)
     else:
-        form = DonationForm()
-    return render(request, 'projects/donate.html', {'form': form}) 
+        donation_form = DonationForm()
+    context = {
+        'project': project,
+        'donation_form': donation_form,
+    }
+    return render(request, 'projects/project_page.html', context)            
 
 
-# def create_project(request):
-
-#     if request.method == "POST":
-#         form = ProjectForm(request.POST)
-#         files = request.FILES.getlist("image")
-#         if form.is_valid():
-#             f = form.save(commit=False)
-#             f.user = request.user
-#             f.save()
-#             for i in files:
-#                 Image.objects.create(project=f, image=i)
-#             return HttpResponse("added")#-----------
-#         else:
-#             print(form.errors)
-#     else:
-#         form = ProjectForm()
-#         imageform = ImageForm()
-
-#     return render(request, "projects/create_project.html", {"form": form, "imageform": imageform})
 
 
-# def try1(request):
-#     return HttpResponse('hello')
 
-# def create_project(request):
-#     if request.method == "POST":
-#         form = ProjectForm(request.POST)
-#         files = request.FILES.getlist("image")
-#         if form.is_valid():
-#             f = form.save(commit=False)
-#             f.user = request.user
-#             f.save()
-            
-#             # Process and save tags
-#             tag_names = request.POST.getlist("tags")  # Assuming the tags are submitted as a list
-#             for tag_name in tag_names:
-#                 tag, created = Tag.objects.get_or_create(name=tag_name)
-#                 f.tags.add(tag)
-            
-#             # Save images
-#             for i in files:
-#                 Image.objects.create(project=f, image=i)
-            
-#             return HttpResponse("added")
-#         else:
-#             print(form.errors)
-#     else:
-#         form = ProjectForm()
-#         imageform = ImageForm()
-#         tags = Tag.objects.all()
-#         return render(request, "projects/create_project.html", {"form": form, "imageform": imageform, "tags": tags})
 
-#     tags = Tag.objects.all()
-#     return render(request, "projects/create_project.html", {"form": form, "imageform": imageform, "tags": tags})
+
 

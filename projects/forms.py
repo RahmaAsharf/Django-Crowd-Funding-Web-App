@@ -1,80 +1,69 @@
 from django import forms
-from projects.models import Project, Image
+from projects.models import Project
 from .models import Donation, Tag, Category, Rating
 from django.core.exceptions import ValidationError
+from datetime import datetime
+from django.shortcuts import get_object_or_404
 
-# class ProjectForm(forms.ModelForm):
-#     class Meta:
-#         model= Project
-#         fields='__all__'
 class ProjectForm(forms.ModelForm):
-    # Add category field
     category = forms.ModelChoiceField(queryset=Category.objects.all(), required=True, label='Category')
-    # Add tags field
     tags = forms.ModelMultipleChoiceField(queryset=Tag.objects.all(), required=False, label='Tags')
 
     class Meta:
         model = Project
-        # fields = '__all__'
         fields = ['title', 'details', 'category', 'total', 'startDate', 'endDate', 'tags']
-        
-        
-    # def clean_totalDonated(self):
-    #     total= self.cleaned_data.get('total')
-    #     if self.instance and self.instance.totalDonate > total:
-    #         raise forms.ValidationError("this exceed total donatetd")
 
-        
-class MultipleClearableFileInput(forms.ClearableFileInput):
-    def __init__(self, attrs=None):
-        super().__init__(attrs)
-        self.attrs['multiple'] = True
+    def clean_total(self):
+        total = self.cleaned_data.get('total')
+        if total <= 0:
+            raise ValidationError("Target amount must be greater than 0.")
+        return total
 
-class ImageForm(forms.ModelForm):
-    class Meta:
-        model = Image
-        fields = ("image",)
-        widgets = {
-            'image': MultipleClearableFileInput()
-        }
+    def clean_startDate(self):
+        start_date = self.cleaned_data.get('startDate')
+        if start_date and datetime.now().date() > start_date:
+            raise ValidationError("Start date shouldn't be less than today.")
+        return start_date
+
+    def clean_endDate(self):
+        start_date = self.cleaned_data.get('startDate')
+        end_date = self.cleaned_data.get('endDate')
+
+        if start_date and end_date:
+            if end_date <= start_date:
+                raise ValidationError("End date should be greater than start date.")
+        
+        return end_date
 
 
 class RatingForm(forms.ModelForm):
     class Meta:
         model = Rating
         fields = [ 'rating']
-        
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Rating
+        fields = ['comment']
 
 
 class DonationForm(forms.ModelForm):
     class Meta:
         model = Donation
         fields = ['amount']
+
+    def __init__(self, *args, **kwargs):
+        self.project_id = kwargs.pop('project_id', None)
+        super().__init__(*args, **kwargs)
+
     def clean_amount(self):
-        amount= self.cleaned_data['amount']
-        if amount < 0:
-             raise forms.ValidationError("amount must be an integer number")
+        amount = self.cleaned_data['amount']
+        if amount <= 0:
+            raise forms.ValidationError("Amount must be greater than 0.")
+        if self.project_id:
+            project = get_object_or_404(Project, pk=self.project_id)
+            total_donated = project.totalDonate()
+            if amount+total_donated > project.total:
+                raise forms.ValidationError("Donation amount exceeds project's funding goal.")
         return amount
 
-    # def clean(self):
-    #     cleaned_data = super().clean()
-    #     start_date = cleaned_data.get('startDate')
-    #     end_date = cleaned_data.get('endDate')
-    #     total = cleaned_data.get('total')
-    #     print("Total:", total)
-    #     if total and total <= 0:
-    #         self.add_error('total', 'Total must be greater than zero.')
-
-
-    #     if start_date and end_date and start_date >= end_date:
-    #         self.add_error('endDate', 'End date must be greater than start date.')
-
-    #     return cleaned_data
-
-# class ImageForm(forms.ModelForm):
-#     class Meta:
-#         model = Image
-#         fields = ("image",)
-#         widgets = {
-#             'image': forms.ClearableFileInput(attrs={'allow_multiple_selected': True})
-#         }

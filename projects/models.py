@@ -1,7 +1,10 @@
 from django.db import models
 from django.urls import reverse
+from django.core.exceptions import ValidationError
 from authentication.models import CustomUser
 from django.db.models import Avg, Count
+
+
 class Category(models.Model):
     name = models.CharField(max_length=100)
 
@@ -30,6 +33,7 @@ class Project(models.Model):
     def __str__(self):
         return self.title
     
+    
     @property
     def show_url(self):
         url = reverse('view_projects')
@@ -49,23 +53,37 @@ class Project(models.Model):
             count = int(reviews['count'])
         return count
     
+    def comments(self):
+        return Rating.objects.filter(project=self.id).exclude(comment__isnull=True)
+    
     def totalDonate(self):
         return sum(donation.amount for donation in self.donation_set.all())
 
         
 class Image(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    image = models.ImageField()
+    file=models.FileField()
 
     def __str__(self):
-        return str(self.image)
+         return str(self.file)
+    
+
+    
+# class Image(models.Model):
+#     project = models.ForeignKey(Project, on_delete=models.CASCADE)
+#     image = models.ImageField()
+
+#     def __str__(self):
+#         return str(self.image)
+    
+
     
 
 class Rating(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     comment = models.TextField(max_length=500, null=True)
-    rating = models.FloatField()
+    rating = models.FloatField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

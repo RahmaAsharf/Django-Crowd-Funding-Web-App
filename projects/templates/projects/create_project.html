@@ -7,91 +7,32 @@
     <div class="row justify-content-center">
         <div class="col-lg-7">
             <div class="card shadow">
-                <div class="card-body ">
+                <div class="card-body">
                     <form id="post_form" method="post" action="" enctype="multipart/form-data">
                         {% csrf_token %}
                         {% for hidden in form.hidden_fields %}
                             {{ hidden }}
                         {% endfor %}
-                        {{ form.field_name.errors }}
-                        
-                        <!-- Title Field -->
-                        <div class="mb-3">
-                            {{ form.title.label_tag }}
-                            {{ form.title }}
-                            {% if form.title.help_text %}
-                                <small class="form-text text-muted">{{ form.title.help_text }}</small>
-                            {% endif %}
-                        </div>
-
-                        <!-- Details Field -->
-                        <div class="mb-3">
-                            {{ form.details.label_tag }}
-                            {{ form.details }} 
-                            {% if form.details.help_text %}
-                                <small class="form-text text-muted">{{ form.details.help_text }}</small>
-                            {% endif %}
-                        </div>
-
-                        <!-- Category and Tags Fields -->
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                {{ form.category.label_tag }}
-                                {{ form.category }}
-                                {% if form.category.help_text %}
-                                    <small class="form-text text-muted">{{ form.category.help_text }}</small>
+                        {% for field in form.visible_fields %}
+                            <div class="mb-3">
+                                {{ field.label_tag }}
+                                {{ field }}
+                                {% for error in field.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                {% endfor %}
+                                {% if field.help_text %}
+                                    <small class="form-text text-muted">{{ field.help_text }}</small>
                                 {% endif %}
                             </div>
-                            <div class="col-md-6">
-                                {{ form.tags.label_tag }}
-                                {{ form.tags }}
-                                {% if form.tags.help_text %}
-                                    <small class="form-text text-muted">{{ form.tags.help_text }}</small>
-                                {% endif %}
-                            </div>
-                        </div>
-
-                        <!-- Start Date and Total Fields -->
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                {{ form.startDate.label_tag }}
-                                {{ form.startDate }}
-                                {% if form.startDate.help_text %}
-                                    <small class="form-text text-muted">{{ form.startDate.help_text }}</small>
-                                {% endif %}
-                            </div>
-                            <div class="col-md-6">
-                                {{ form.total.label_tag }}
-                                {{ form.total }}
-                                {% if form.total.help_text %}
-                                    <small class="form-text text-muted">{{ form.total.help_text }}</small>
-                                {% endif %}
-                            </div>
-                        </div>
-
-                        <!-- End Date Field -->
-                        <div class="mb-3">
-                            {{ form.endDate.label_tag }}
-                            {{ form.endDate }}
-                            {% if form.endDate.help_text %}
-                                <small class="form-text text-muted">{{ form.endDate.help_text }}</small>
-                            {% endif %}
-                        </div>
+                        {% endfor %}
 
                         <!-- Image Field -->
                         <div class="mb-3">
-                            {{ imageform.management_form }}
-                            {% for img_form in imageform %}
-                                {{ img_form.label_tag }}
-                                {{ img_form }}
-                                {% if img_form.help_text %}
-                                    <small class="form-text text-muted">{{ img_form.help_text }}</small>
-                                {% endif %}
-                            {% endfor %}
+                            <label for="id_files">Files:</label>
+                            <input type="file" name="files" id="id_files" multiple>
                         </div>
                         <div class="text-center">
-                            <button class="btn btn-primary btn-lg btn-block " type="submit" name="submit">Submit</button>
-
+                            <button class="btn btn-primary btn-lg btn-block" type="submit" name="submit">Submit</button>
                         </div>
                     </form>
                 </div>
