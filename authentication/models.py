@@ -18,7 +18,7 @@ class CustomUser(AbstractUser):
   first_name = models.CharField(max_length=100)
   last_name = models.CharField(max_length=100)
   mobile_phone = models.CharField(max_length=11)
-  profile_picture = models.ImageField(upload_to='authentication/images/', null=True) # (REQUIRED)
+  profile_picture = models.ImageField(upload_to='media', null=True) # (REQUIRED)
   confirm_password = models.CharField(max_length=100)
   activation_key = models.UUIDField(default=uuid.uuid4, editable=False)
   birthdate = models.DateField(null=True, blank=True)
@@ -38,5 +38,5 @@ class CustomUser(AbstractUser):
   
   @property
   def image_url(self):
-    return f'/images/{self.profile_picture}'
+    return f'/media/{self.profile_picture}'
 
