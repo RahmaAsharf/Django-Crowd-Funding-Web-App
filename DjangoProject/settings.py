@@ -50,6 +50,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'authentication.middleware.CheckUserIdMiddleware',
 ]
 
 ROOT_URLCONF = 'DjangoProject.urls'
@@ -57,7 +58,7 @@ ROOT_URLCONF = 'DjangoProject.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR/'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -87,8 +88,6 @@ DATABASES = {
         'PORT': '3306',       # Default MySQL port
     }
 }
-
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -133,3 +132,22 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 import os
 MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+
+# add media url
+# import os
+# MEDIA_URL = 'images/'
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'images/')
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # Replace 'smtp.example.com' with your SMTP server address
+EMAIL_PORT = 587  # Replace with your SMTP port (587 for TLS, 465 for SSL)
+EMAIL_USE_TLS = True  # Set to True if your SMTP server uses TLS, False otherwise
+EMAIL_HOST_USER = 'guihadyosry@gmail.com'  # Replace with your email address
+EMAIL_HOST_PASSWORD = 'gsus fgmh qfrd egyw'  # Replace with your email password
+DEFAULT_FROM_EMAIL = 'guihadyosry@gmail.com'  # Replace with the default sender email address
+
+DOMAIN = 'http://127.0.0.1:8000'  
+
+AUTH_USER_MODEL = 'authentication.CustomUser'
+

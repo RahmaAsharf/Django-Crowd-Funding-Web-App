@@ -13,7 +13,8 @@ def create_project(request):
 
         if form.is_valid():
             project = form.save(commit=False)
-            project.user_id = 1  # Assuming user_id needs to be set to 1
+            # project.user_id = 1  # Assuming user_id needs to be set to 1
+            project.user_id = request.user.id
             project.save()
 
             for file in files:
@@ -21,8 +22,7 @@ def create_project(request):
                 new_file.save()
                 file_urls.append(new_file.file.url)
 
-            form.save_m2m()  # Save many-to-many relationships
-            # Redirect to project_view with project_id as a parameter
+            form.save_m2m()
             return redirect('view_projects')
     else:
         form = ProjectForm()

@@ -19,10 +19,14 @@ from django.urls import path
 from django.urls import include
 from django.conf import settings
 from django.conf.urls.static import static
-
+from authentication.views import profile
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('authentication/', include('authentication.urls')),
     path('projects/', include('projects.urls')),
+    path('accounts/profile/',profile,)
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    
+    
+
