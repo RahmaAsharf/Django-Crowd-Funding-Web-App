@@ -1,6 +1,6 @@
 from django import forms
 from projects.models import Project
-from .models import Donation, Tag, Category, Rating
+from .models import Donation, Tag, Category, Rating , Report
 from django.core.exceptions import ValidationError
 from datetime import datetime
 from django.shortcuts import get_object_or_404
@@ -68,3 +68,37 @@ class DonationForm(forms.ModelForm):
         return amount
     
 
+
+class ReportForm(forms.ModelForm):
+    status_ = (('Hateful Speech','Hateful Speech'),('Profanity', 'Profanity'),
+                ('Abuse', 'Abuse'),('Violence','Violence'),
+                ('Irrelevant','Irrelevant'))
+
+    status = forms.ChoiceField(choices=status_)
+
+    class Meta:
+        model = Report
+        fields = ['reason','status']
+
+    # def clean(self):
+    #     cleaned_data = super().clean()
+    #     start_date = cleaned_data.get('startDate')
+    #     end_date = cleaned_data.get('endDate')
+    #     total = cleaned_data.get('total')
+    #     print("Total:", total)
+    #     if total and total <= 0:
+    #         self.add_error('total', 'Total must be greater than zero.')
+
+
+    #     if start_date and end_date and start_date >= end_date:
+    #         self.add_error('endDate', 'End date must be greater than start date.')
+
+    #     return cleaned_data
+
+# class ImageForm(forms.ModelForm):
+#     class Meta:
+#         model = Image
+#         fields = ("image",)
+#         widgets = {
+#             'image': forms.ClearableFileInput(attrs={'allow_multiple_selected': True})
+#         }

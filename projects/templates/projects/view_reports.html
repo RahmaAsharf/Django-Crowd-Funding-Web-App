@@ -1,0 +1,59 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block 'content' %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Reports for Project</title>
+</head>
+<body>
+    <style>
+        th {
+            padding: 8px; /* Add padding to each table header */
+        }
+        td {
+            padding: 8px; /* Add padding to each table header */
+        }
+    </style>
+    <h1>All Reports for Project</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Report ID</th>
+
+                <th>User Name</th>
+
+                <th>Reason</th>
+
+                <th>Status</th>
+
+                <th>Created At</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for report in all_reports %}
+            <tr>
+                <td>{{ report.id }}</td> 
+                <td>{{ report.user.first_name }}</td>   <!-- Access user username -->
+                <td>{{ report.reason }}</td>
+                <td>{{ report.status }}</td>
+                <td>{{ report.created_at }}</td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <a href="{% url 'project_page' id%}" class="btn btn-success btn-donate">Back to project</a>
+
+</body>
+</html>
+
+
+
+
+{% endblock %}
