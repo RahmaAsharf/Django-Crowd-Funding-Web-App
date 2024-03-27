@@ -18,9 +18,12 @@ class CustomUser(AbstractUser):
   first_name = models.CharField(max_length=100)
   last_name = models.CharField(max_length=100)
   mobile_phone = models.CharField(max_length=11)
-  profile_picture = models.ImageField(upload_to='profile_pics/', null=True, blank=True)
+  profile_picture = models.ImageField(upload_to='authentication/images/', null=True) # (REQUIRED)
   confirm_password = models.CharField(max_length=100)
   activation_key = models.UUIDField(default=uuid.uuid4, editable=False)
+  birthdate = models.DateField(null=True, blank=True)
+  facebook_profile = models.URLField(max_length=200, null=True, blank=True)
+  country = models.CharField(max_length=100, null=True, blank=True)
   
   def activate(self):
     self.is_active = True
@@ -32,4 +35,8 @@ class CustomUser(AbstractUser):
   @classmethod
   def get_all_users(cls):
     return cls.objects.all()
+  
+  @property
+  def image_url(self):
+    return f'/images/{self.profile_picture}'
 

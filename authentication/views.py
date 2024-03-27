@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.http import HttpResponse
 from DjangoProject.settings import DOMAIN
-from authentication.forms import  UserModelForm
+from authentication.forms import  UserModelForm, UserProfileForm
 from authentication.models import CustomUser
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
 from django.utils import timezone
@@ -28,7 +29,7 @@ User = get_user_model()
 
 def register(request):
     if request.method == 'POST':
-        form = UserModelForm(request.POST)
+        form = UserModelForm(request.POST, request.FILES)
         if form.is_valid():
             user = form.save(commit=False)
             user.is_active = False  # User is not active until activated via email
@@ -67,6 +68,34 @@ def activate_account(request, activation_key):
     user.is_active = True
     user.save()
     return redirect('landing')
+
+# @login_required(login_url='/authentication/login/')
+def view_profile(request, id):
+    user = get_object_or_404(CustomUser, pk=id)
+    return render(request, 'authentication/profile.html', {'user': user})
+
+# @login_required(login_url='/authentication/login/')
+def edit_profile(request, id):
+    user = get_object_or_404(CustomUser, pk=id)
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, request.FILES, instance=user)
+        if form.is_valid():
+            form.save()
+            return redirect('view.profile', id=id)
+    else:
+        # form = UserModelForm(instance=user)
+        # Set initial password field to empty string when editing profile
+        form = UserProfileForm(instance=user, initial={'password': '','confirm_password': ''}) 
+    return render(request, 'authentication/edit_profile.html', {'form': form, 'id': id})
+
+# @login_required(login_url='/authentication/login/')
+def delete_account(request, id):
+    user = get_object_or_404(CustomUser, pk=id)
+    if request.method == 'POST':
+        user.delete()
+        return redirect('landing') 
+    return render(request, 'authentication/delete_account.html', {'user': user})
+
 
 
 # def password_reset(request):

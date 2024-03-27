@@ -1,14 +1,29 @@
-
-
-{% extends 'layouts/base.html'%}
+{% extends 'layouts/base.html' %}
 {% load static %}
 {% block 'content' %}
-  <h1> welcome to login page </h1>
-<form method="post">
-  {% csrf_token %}
-{{form}}
-    <input type="submit" class="btn btn-dark" value="login">
-    <a href="{% url 'password_reset' %}">Forgot Password?</a>
-  </form>
-  <script src="{% static 'authentication/js/script.js'%}"> </script>
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card shadow">
+        <div class="card-header bg-info text-white">
+          <h1 class="card-title text-center" style="font-size: 2rem;">Login</h1>
+        </div>
+        <div class="card-body">
+          <form method="post">
+            {% csrf_token %}
+            {{ form }}
+            <div class="form-group mt-4 text-center">
+              <button type="submit" class="btn btn-primary btn-block">Login</button>
+            </div>
+          </form>
+          <hr>
+          <div class="text-center">
+            <a href="{% url 'password_reset' %}" class="text-muted">Forgot Password?</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="{% static 'authentication/js/script.js' %}"></script>
 {% endblock %}

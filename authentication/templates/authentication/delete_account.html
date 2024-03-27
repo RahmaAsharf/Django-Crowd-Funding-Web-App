@@ -1,0 +1,53 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block 'content' %}
+
+<style>
+    .card {
+        border: none;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-header {
+        background-color: #17a2b8;
+        color: white;
+        font-size: 2rem;
+        font-weight: 600;
+        padding: 20px;
+        border-radius: 10px 10px 0 0;
+        text-align: center;
+    }
+
+    .card-body {
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+</style>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    Delete Account
+                </div>
+                <div class="card-body">
+                    <p class="card-text" style="font-size: large; margin-bottom: .6rem;">Are you sure you want to delete your account?</p>
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-danger">Confirm</button>
+                            <a href="{% url 'view.profile' user.id %}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'authentication/js/script.js'%}"></script>
+{% endblock %}

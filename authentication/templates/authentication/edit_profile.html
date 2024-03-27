@@ -1,0 +1,59 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block 'content' %}
+
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-10">
+      <div class="card">
+        <div class="card-header bg-info text-white">
+          <h1 class="card-title text-center" style="font-size: 2rem;">Edit Profile</h1>
+        </div>
+        <div class="card-body">
+          <form method="post" enctype="multipart/form-data" class="p-5">
+            {% csrf_token %}
+            {% for field in form %}
+              <div class="form-group">
+                {{ field.label_tag }}
+                {{ field }}
+                {% for error in field.errors %}
+                  <p class="alert alert-danger">{{ error }}</p>
+                {% endfor %}
+              </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-info">Save Changes</button>
+            <a href="{% url 'view.profile' id %}" class="btn btn-secondary">Back to Profile</a>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{% static 'authentication/js/script.js'%}"></script>
+
+<style>
+  .card {
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  }
+
+  .card-header {
+    border-radius: 10px 10px 0 0;
+  }
+  
+  .card-title {
+    margin-bottom: 0.5rem;
+  }
+  
+  .form-label {
+    font-weight: bold;
+  }
+  
+  .btn {
+    border-radius: 5px;
+    margin-right: 10px;
+  }
+</style>
+
+{% endblock %}
