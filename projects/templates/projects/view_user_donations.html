@@ -1,0 +1,22 @@
+<!-- view_user_donations.html -->
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block 'content' %}
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
+    <h1 class="text-center mb-4">Your Donations</h1>
+    <div class="row">
+        {% for donation in user_donations %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">Donation: {{ donation.amount }}</h2>
+                    <p class="card-text">Project: {{ donation.project.title }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+{% endblock %}

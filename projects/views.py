@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect , get_object_or_404
 from django.http import HttpResponse
-from projects.models import Project,Image, Tag, Category, Rating, Report
+from projects.models import Project,Image, Tag, Category, Rating, Report, Donation
 from projects.forms import DonationForm, ProjectForm, RatingForm, CommentForm, RatingForm , ReportForm
 from decimal import Decimal
 from django.utils import timezone
@@ -196,6 +196,11 @@ def top_projects(request):
 def view_user_projects(request):
     user_projects = Project.objects.filter(user=request.user)
     return render(request, 'projects/view_user_projects.html', {'user_projects': user_projects})
+
+@login_required(login_url='/authentication/login/')
+def view_user_donations(request):
+    user_donations = Donation.objects.filter(user=request.user)
+    return render(request, 'projects/view_user_donations.html', {'user_donations': user_donations})
 
 
 
