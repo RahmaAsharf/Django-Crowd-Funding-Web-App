@@ -147,7 +147,7 @@ EMAIL_HOST_USER = 'guihadyosry@gmail.com'  # Replace with your email address
 EMAIL_HOST_PASSWORD = 'gsus fgmh qfrd egyw'  # Replace with your email password
 DEFAULT_FROM_EMAIL = 'guihadyosry@gmail.com'  # Replace with the default sender email address
 
-DOMAIN = 'http://127.0.0.1:8000'  
+DOMAIN = 'http://127.0.0.1:8082'  
 
 AUTH_USER_MODEL = 'authentication.CustomUser'
 

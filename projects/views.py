@@ -4,7 +4,10 @@ from projects.models import Project,Image, Tag, Category, Rating, Report
 from projects.forms import DonationForm, ProjectForm, RatingForm, CommentForm, RatingForm , ReportForm
 from decimal import Decimal
 from django.utils import timezone
+from django.http import HttpResponseRedirect
+from django.contrib.auth.decorators import login_required
 
+@login_required(login_url='/authentication/login/')
 def create_project(request):
     if request.method == "POST":
         form = ProjectForm(request.POST)
@@ -13,7 +16,6 @@ def create_project(request):
 
         if form.is_valid():
             project = form.save(commit=False)
-            # project.user_id = 1  # Assuming user_id needs to be set to 1
             project.user_id = request.user.id
             project.save()
 
@@ -87,6 +89,7 @@ def project_page(request, id):
 #             can_delete = True
 #     return render(request, 'projects/view_project.html', {'project': project, 'can_delete': can_delete}
 
+@login_required(login_url='/authentication/login/')
 def delete_project(request, id):
     project = Project.objects.get(id=id)
     if request.method == 'POST':
@@ -95,7 +98,8 @@ def delete_project(request, id):
        
     return render(request, 'projects/delete.html', {'project': project})
 
-        
+
+
 def add_rate(request, project_id):
     url = request.META.get('HTTP_REFERER')
     if request.method == 'POST':
@@ -103,8 +107,7 @@ def add_rate(request, project_id):
         if form.is_valid():
             data = form.save(commit=False)
             data.project_id = project_id
-            #data.user_id = request.user.id
-            data.user_id = 1  
+            data.user_id = request.user.id  
             data.save()
             return redirect(url)
         # error retuen
@@ -117,13 +120,14 @@ def add_comment(request, project_id):
         if form.is_valid():
             data = form.save(commit=False)
             data.project_id = project_id
-            #data.user_id = request.user.id
-            data.user_id = 1  
+            data.user_id = request.user.id
             data.save()
             return redirect(url)
         # error retuen
     return redirect(url)
 
+
+@login_required(login_url='/authentication/login/')
 def donate(request, id):
     project = get_object_or_404(Project, pk=id)
     if request.method == 'POST':
@@ -131,8 +135,7 @@ def donate(request, id):
         if donation_form.is_valid():
             donation = donation_form.save(commit=False)
             donation.project_id = id
-            #data.user_id = request.user.id
-            donation.user_id = 1
+            donation.user_id = request.user.id
             donation.save()
             return redirect('project_page', id=id)
         else:
@@ -149,6 +152,7 @@ def donate(request, id):
         'donation_form': donation_form,
     }
     return render(request, 'projects/project_page.html', context)   
+
 def top_projects(request):
 
     today = timezone.now().date()
@@ -157,15 +161,14 @@ def top_projects(request):
     sorted_projects = sorted(running_projects, key=lambda x: x.averageReview(), reverse=True)[:2]
     return render(request, 'projects/home.html', {'top_projects': sorted_projects})
       
-
+@login_required(login_url='/authentication/login/')
 def report_project(request, id):
     if request.method == 'POST':
         form = ReportForm(request.POST)
         if form.is_valid():
             report = form.save(commit=False)
             report.project_id = id
-            # report.user = request.user  # Assuming the user is logged in
-            report.user_id = 1
+            report.user = request.user 
             report.save()
             return redirect('project_page', id=id)  # Redirect to the project detail page
     else:
@@ -173,6 +176,7 @@ def report_project(request, id):
     
     return render(request, 'projects/report.html', {'form': form})  
 
+#////////////////////////////////////////////////////////////////////////
 def view_all_reports(request, id):
     # Retrieve all reports for the specified project ID
     

@@ -1,4 +1,4 @@
-{% extends 'layouts/projects/base.html' %}
+{% extends 'layouts/base.html' %}
 {% load static %}
 
 {% block 'content' %}
@@ -40,7 +40,14 @@
                     <p class="card-text">Total Donated: {{ project.totalDonate }}</p>
                     <div class="text-center mt-3">
                         <a href="#" class="btn btn-primary btn-comment">Comment</a>
-                        <a href="#" class="btn btn-success btn-rate">Rate</a>
+                        <div id="ratingFormContainer" style="display:none;">
+                            {% include 'projects/rate.html' %}
+                        </div>
+                        <button id="rateButton">Rate</button>
+                        <!-- <a href="#" class="btn btn-success btn-rate">Rate</a> -->
+
+
+                        
                         {% if project.total > project.totalDonate  %}
                         {% if donation_form.errors %}
                             <div >
@@ -181,29 +188,7 @@
     
         {% endfor %}
     </div>
-    <div id="ratingForm" style="display: none;">
-        <form action="{% url 'add_rate' project.id %}" method="POST">
-            {% csrf_token %}
-            <div>
-                <label>How do you rate this project?</label>
-                <br>
-                <div class="rate">
-                    <input type="radio" name="rating" id="rating10" value="5" required /><label for="rating10" title="5"></label>
-                    <input type="radio" name="rating" id="rating9" value="4.5" required /><label for="rating9" title="4.5" class="half"></label>
-                    <input type="radio" name="rating" id="rating8" value="4" required /><label for="rating8" title="4"></label>
-                    <input type="radio" name="rating" id="rating7" value="3.5" required /><label for="rating7" title="3.5" class="half"></label>
-                    <input type="radio" name="rating" id="rating6" value="3" required /><label for="rating6" title="3"></label>
-                    <input type="radio" name="rating" id="rating5" value="2.5" required /><label for="rating5" title="2.5" class="half"></label>
-                    <input type="radio" name="rating" id="rating4" value="2" required /><label for="rating4" title="2"></label>
-                    <input type="radio" name="rating" id="rating3" value="1.5" required /><label for="rating3" title="1.5" class="half"></label>
-                    <input type="radio" name="rating" id="rating2" value="1" required /><label for="rating2" title="1"></label>
-                    <input type="radio" name="rating" id="rating1" value="0.5" required /><label for="rating1" title="0.5" class="half"></label>
-                </div>
-                <br>
-                <input type="submit" value="Submit Review" class="btn btn-primary">
-            </div>
-        </form>
-    </div>
+    
     <div id="commentForm" style="display: none;">
         <form action="{% url 'add_comment' project.id %}" method="POST">
             {% csrf_token %}
@@ -253,10 +238,11 @@
         showForm('commentForm'); // Show the comment form
     });
 
-    // Click event handler for rate button
-    $(".btn-rate").click(function(event) {
-        showForm('ratingForm'); // Show the rating form
-    });
+    document.getElementById('rateButton').onclick = function() {
+    var formContainer = document.getElementById('ratingFormContainer');
+    formContainer.style.display = 'block'; // Show the form
+    };
+
 });
 
 </script>
