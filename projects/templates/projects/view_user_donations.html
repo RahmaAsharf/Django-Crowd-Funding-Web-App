@@ -1,22 +1,82 @@
-<!-- view_user_donations.html -->
 {% extends 'layouts/base.html' %}
 {% load static %}
-
 {% block 'content' %}
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
-    <h1 class="text-center mb-4">Your Donations</h1>
-    <div class="row">
-        {% for donation in user_donations %}
-        <div class="col-md-4 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <h2 class="card-title">Donation: {{ donation.amount }}</h2>
-                    <p class="card-text">Project: {{ donation.project.title }}</p>
+
+<style>
+    .card {
+        margin-bottom: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        background-color: #e9ecef;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .card-title {
+        font-size: 1.7rem;
+        font-weight: bold;
+        margin-bottom: 12px;
+    }
+
+    .card-text {
+        color: #656363;
+        margin-bottom: 5px;
+    }
+
+    .custom-heading {
+        font-size: 2rem;
+        font-weight: normal;
+        margin-bottom: 25px;
+        margin-top: 15px;
+        text-align: center;
+        letter-spacing: 3px;
+    }
+
+    .btn-primary {
+        color: #fff;
+        background-color: #286090;
+        border-color: #2e6da4;
+        margin-bottom: 8px;
+    }
+</style>
+
+<h1 class="custom-heading">Your Donations</h1>
+<div class="row">
+    {% regroup user_donations by project.title as donation_list %}
+    {% if donation_list %}
+    {% for project in donation_list %}
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title">{{ project.grouper }}</h2>
+                {% for donation in project.list %}
+                <div class="card-text"><strong>Donation {{ forloop.counter }}:</strong> {{ donation.amount }}</div>
+                {% endfor %}
+                <div class="text-center mt-3">
+                    <a href="{% url 'project_page' project.list.0.project.id %}" class="btn btn-primary">View Project</a>
                 </div>
+                
             </div>
         </div>
-        {% endfor %}
     </div>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    {% endfor %}
+    {% else %}
+    <div class="col-md-12" style="text-align: center; font-size: large;">
+        <div class="alert alert-info" role="alert">
+            You haven't made any donations yet!
+        </div>
+    </div>
+    {% endif %}
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 {% endblock %}
