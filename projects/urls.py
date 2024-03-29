@@ -1,6 +1,6 @@
 from django.urls import path
-from projects.views import create_project,view_projects,donate, delete_project,project_page,top_projects, project_page, add_rate, add_comment, report_project, view_all_reports
-from projects.views import top_projects
+from projects.views import *
+
 urlpatterns = [
     # path('try', try1)
     path('add', create_project, name="create_project"),
@@ -13,4 +13,5 @@ urlpatterns = [
     path('home', top_projects, name="home"),
     path('report/<int:id>', report_project, name="report_project"),
     path('reportview/<int:id>', view_all_reports, name="view_reports"),
+    path('projects/', view_user_projects, name='view_user_projects'),
 ]

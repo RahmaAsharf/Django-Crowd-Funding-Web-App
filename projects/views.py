@@ -191,6 +191,12 @@ def top_projects(request):
     sorted_projects = sorted(running_projects, key=lambda x: x.averageReview(), reverse=True)[:2]
     return render(request, 'projects/home.html', {'top_projects': sorted_projects})
 
+# *************************\ View Pojects & Donations for only Logged in User /*************************
+@login_required(login_url='/authentication/login/')
+def view_user_projects(request):
+    user_projects = Project.objects.filter(user=request.user)
+    return render(request, 'projects/view_user_projects.html', {'user_projects': user_projects})
+
 
 
 
