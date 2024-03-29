@@ -58,50 +58,32 @@ class UserModelForm(forms.ModelForm):
 class UserProfileForm(forms.ModelForm):
     class Meta:
         model  = CustomUser
-        # Retreive all form data except email field
-        fields= ('first_name', 'last_name', 'username', 'password','confirm_password',
-                 'mobile_phone','profile_picture','birthdate','facebook_profile','country')
+        fields= ('first_name', 'last_name', 'mobile_phone', 'profile_picture', 'birthdate', 'facebook_profile', 'country')
         
         widgets = {
-            'password': forms.PasswordInput(),
-            'confirm_password': forms.PasswordInput(),
             'birthdate': forms.DateInput(attrs={'type': 'date'}),
         }
-
-    # called when creating an instance of form
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Check if the form is used to edit an existing user (instance has a primary key)
-        if self.instance.pk:
-            self.fields['password'].required = False # password is not required
-            self.fields['confirm_password'].required = False 
-        else:
-            self.fields['password'].required = True # password is required
-            self.fields['confirm_password'].required = True 
 
     def clean_mobile_phone(self):
         mobile_phone = self.cleaned_data['mobile_phone']
         if not mobile_phone.startswith('01') or len(mobile_phone) != 11:
             raise forms.ValidationError("Please enter a valid Egyptian phone number")
         return mobile_phone
-    
-    def clean_password(self):
-        password = self.cleaned_data.get('password')
-        if password:
-            validate_password(password)
-        return password
-        
-    def clean_confirm_password(self):
-        password = self.cleaned_data.get('password')
-        confirm_password = self.cleaned_data.get('confirm_password')
-        if password and confirm_password and password != confirm_password:
-            raise forms.ValidationError("Passwords do not match.")
-        return confirm_password  
 
     def save(self, commit=True):
         user = super().save(commit=False)
-        user.password = make_password(self.cleaned_data["password"])
-        user.confirm_password = make_password(self.cleaned_data["confirm_password"])
         if commit:
             user.save()
         return user 
+    
+class ChangePasswordForm(forms.Form):
+    old_password = forms.CharField(widget=forms.PasswordInput)
+    new_password1 = forms.CharField(widget=forms.PasswordInput)
+    new_password2 = forms.CharField(widget=forms.PasswordInput)
+
+    def clean_new_password2(self):
+        new_password1 = self.cleaned_data.get('new_password1')
+        new_password2 = self.cleaned_data.get('new_password2')
+        if new_password1 and new_password2 and new_password1 != new_password2:
+            raise forms.ValidationError("Passwords do not match.")
+        return new_password2

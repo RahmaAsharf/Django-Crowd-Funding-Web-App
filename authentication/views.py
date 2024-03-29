@@ -3,11 +3,12 @@ from django.http import HttpResponse
 from DjangoProject.settings import DOMAIN
 from authentication.forms import  UserModelForm, UserProfileForm
 from authentication.models import CustomUser
-from django.contrib import messages
+from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
+from django.contrib.auth import update_session_auth_hash
 from django.utils import timezone
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.tokens import default_token_generator
@@ -69,12 +70,12 @@ def activate_account(request, activation_key):
     user.save()
     return redirect('landing')
 
-# @login_required(login_url='/authentication/login/')
+@login_required
 def view_profile(request, id):
     user = get_object_or_404(CustomUser, pk=id)
     return render(request, 'authentication/profile.html', {'user': user})
 
-# @login_required(login_url='/authentication/login/')
+@login_required
 def edit_profile(request, id):
     user = get_object_or_404(CustomUser, pk=id)
     if request.method == 'POST':
@@ -83,12 +84,10 @@ def edit_profile(request, id):
             form.save()
             return redirect('view.profile', id=id)
     else:
-        # form = UserModelForm(instance=user)
-        # Set initial password field to empty string when editing profile
-        form = UserProfileForm(instance=user, initial={'password': '','confirm_password': ''}) 
+        form = UserProfileForm(instance=user)
     return render(request, 'authentication/edit_profile.html', {'form': form, 'id': id})
 
-# @login_required(login_url='/authentication/login/')
+@login_required
 def delete_account(request, id):
     user = get_object_or_404(CustomUser, pk=id)
     if request.method == 'POST':
@@ -96,6 +95,22 @@ def delete_account(request, id):
         return redirect('landing') 
     return render(request, 'authentication/delete_account.html', {'user': user})
 
+@login_required
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            old_password = form.cleaned_data.get('old_password')
+            new_password1 = form.cleaned_data.get('new_password1')
+            if old_password == new_password1:
+                form.add_error('new_password1', "New password can't be same as the old password!")
+            else:
+                user = form.save()
+                update_session_auth_hash(request, user)
+                return redirect('view.profile', id=request.user.id)
+    else:
+        form = PasswordChangeForm(request.user)
+    return render(request, 'authentication/change_password.html', {'form': form})
 
 
 # def password_reset(request):
