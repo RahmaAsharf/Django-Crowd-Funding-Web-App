@@ -2,210 +2,204 @@
 {% load static %}
 
 {% block 'content' %}
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
     
-    <h1 class="text-center mb-4">{{ project.title }} Page</h1>
-    <div class="row">
-        <div class="col-md-4 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    {% if project.user_id == 1 %}
-                    <h5 class="card-title" style="color: red;">project has {{ report_count }} reports</h5>
-                    <a href="{% url 'view_reports' project.id %}" class="btn btn-success btn-donate">View reports</a>
-                    {% endif %}
-                    <h2 class="card-title">{{ project.title }}</h2>
-                    <p class="card-text">{{ project.details }}</p>
-                    <p class="card-text">Total: {{ project.total }}</p>
-                    <p class="card-text">Start Date: {{ project.startDate }}</p>
-                    <p class="card-text">End Date: {{ project.endDate }}</p>
-                    <p class="card-text">Category: {{ project.category.name }}</p>
-                    <h3>Tags:</h3>
-                    <ul class="list-unstyled">
-                        {% for tag in project.tags.all %}
-                        <li>{{ tag.name }}</li>
-                        {% endfor %}
-                    </ul>
-                    
-                    <h3>Customer Reviews </h3>
-                    <div class="rating-star">
-                        <span>
-                            <i class="fa fa-star{% if project.averageReview  < 0.5 %}-o{% elif project.averageReview  >= 0.5 and project.averageReview  < 1 %}-half-o {% endif %}" aria-hidden="true"></i>
-                            <i class="fa fa-star{% if project.averageReview  < 1.5 %}-o{% elif project.averageReview  >= 1.5 and project.averageReview  < 2 %}-half-o {% endif %}" aria-hidden="true"></i>
-                            <i class="fa fa-star{% if project.averageReview  < 2.5 %}-o{% elif project.averageReview  >= 2.5 and project.averageReview  < 3 %}-half-o {% endif %}" aria-hidden="true"></i>
-                            <i class="fa fa-star{% if project.averageReview  < 3.5 %}-o{% elif project.averageReview  >= 3.5 and project.averageReview  < 4 %}-half-o {% endif %}" aria-hidden="true"></i>
-                            <i class="fa fa-star{% if project.averageReview  < 4.5 %}-o{% elif project.averageReview  >= 4.5 and project.averageReview  < 5 %}-half-o {% endif %}" aria-hidden="true"></i>
-                    <span>{{single_product.countReview}} reviews</span>
-                            </span>
-                    </div>
-                    <p class="card-text">Total Donated: {{ project.totalDonate }}</p>
-                    <div class="text-center mt-3">
-                        <a href="#" class="btn btn-primary btn-comment">Comment</a>
-                        <div id="ratingFormContainer" style="display:none;">
-                            {% include 'projects/rate.html' %}
-                        </div>
-                        <button id="rateButton">Rate</button>
-                        <!-- <a href="#" class="btn btn-success btn-rate">Rate</a> -->
-
-
-                        
-                        {% if project.total > project.totalDonate  %}
-                        {% if donation_form.errors %}
-                            <div >
-                                <ul>
-                                    {% for field, errors in donation_form.errors.items %}
-                                        {% for error in errors %}
-                                            {% if error != "This field is required." %}
-                                                <li class="alert alert-danger" >{{ field }}: {{ error }}</li>
-                                            {% endif %}
-                                        {% endfor %}
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                        {% endif %}
-                        
-                            <div id="donatecontainer">
-                            <form method="post" action="{% url 'donate' id=project.id %}">
-                                {% csrf_token %}
-                                {{ donation_form.amount}} 
-                                <button type="submit" class="btn btn-primary">Donate</button>
-                            </form>
-                            </div>
-                            <br><br>
-                            <div class="progress">
-                                <div id="donate-progress" class="progress-bar progress-bar-striped active" role="progressbar"
-                                    aria-valuenow="{{ project.totalDonate }}" aria-valuemin="0" aria-valuemax="{{ project.total }}">
-                                </div>
-                            </div>
-                        {% endif %}
-                        <br><br>
-                        <a href="{% url 'view_projects' %}" class="btn btn-success btn-donate">Back to all projects</a>
-                        <a href="{% url 'report_project' project.id  %}" class="btn btn-success btn-donate ">Report</a>
-
-                    </div>
-                </div>
-                {% if can_delete %}
-                    <a href="{% url 'delete_project' project.id %}" class="btn btn-success btn-donate">Delete</a>
+<h1 class="text-center mb-4">{{ project.title }} Page</h1>
+<div class="row">
+    <div class="col-md-8 mb-4">
+        <div class="card">
+            <div class="card-body">
+                {% if project.user_id == 1 %}
+                <h5 class="card-title" style="color: red;">project has {{ report_count }} reports</h5>
+                <a href="{% url 'view_reports' project.id %}" class="btn btn-success btn-donate">View reports</a>
                 {% endif %}
-
-                <div class="card-footer">
-        
-                    <div id="carousel-{{ project.id }}" class="carousel slide" data-ride="carousel">
-                        <!-- Indicators -->
-                        <ol class="carousel-indicators">
-                            {% for image in project.image_set.all %}
-                            <li data-target="#carousel-{{ project.id }}" data-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active"{% endif %}></li>
-                            {% endfor %}
-                        </ol>
-                        
-                        <!-- Wrapper for slides -->
-                        <div class="carousel-inner">
-                            {% for image in project.image_set.all %}
-                            <div class="item {% if forloop.first %}active{% endif %}">
-                                <img src="{{ image.file.url }}" alt="{{ project.title }}" style="width:100%;">
-                            </div>
-                            {% endfor %}
-                        </div>
-
-                        <!-- Left and right controls -->
-                        <a class="left carousel-control" href="#carousel-{{ project.id }}" data-slide="prev">
-                            <span class="glyphicon glyphicon-chevron-left"></span>
-                            <span class="sr-only">Previous</span>
-                        </a>
-                        <a class="right carousel-control" href="#carousel-{{ project.id }}" data-slide="next">
-                            <span class="glyphicon glyphicon-chevron-right"></span>
-                            <span class="sr-only">Next</span>
-                        </a>
-                    </div>
+                <h2 class="card-title">{{ project.title }}</h2>
+                <p class="card-text">{{ project.details }}</p>
+                <p class="card-text">Total: {{ project.total }}</p>
+                <p class="card-text">Start Date: {{ project.startDate }}</p>
+                <p class="card-text">End Date: {{ project.endDate }}</p>
+                <p class="card-text">Category: {{ project.category.name }}</p>
+                <p class="card-text">Owner: {{ project.user.username }}</p>
+                <h3>Tags:</h3>
+                <ul class="list-unstyled">
+                    {% for tag in project.tags.all %}
+                    <li>{{ tag.name }}</li>
+                    {% endfor %}
+                </ul>
+                
+                <h3>Customer Reviews </h3>
+                <div class="rating-star">
+                    <span>
+                        <i class="fa fa-star{% if project.averageReview  < 0.5 %}-o{% elif project.averageReview  >= 0.5 and project.averageReview  < 1 %}-half-o {% endif %}" aria-hidden="true"></i>
+                        <i class="fa fa-star{% if project.averageReview  < 1.5 %}-o{% elif project.averageReview  >= 1.5 and project.averageReview  < 2 %}-half-o {% endif %}" aria-hidden="true"></i>
+                        <i class="fa fa-star{% if project.averageReview  < 2.5 %}-o{% elif project.averageReview  >= 2.5 and project.averageReview  < 3 %}-half-o {% endif %}" aria-hidden="true"></i>
+                        <i class="fa fa-star{% if project.averageReview  < 3.5 %}-o{% elif project.averageReview  >= 3.5 and project.averageReview  < 4 %}-half-o {% endif %}" aria-hidden="true"></i>
+                        <i class="fa fa-star{% if project.averageReview  < 4.5 %}-o{% elif project.averageReview  >= 4.5 and project.averageReview  < 5 %}-half-o {% endif %}" aria-hidden="true"></i>
+                <span>{{single_product.countReview}} reviews</span>
+                        </span>
                 </div>
+                
             </div>
         </div>
-    </div>
-    <!-- ///////////////////////////comments show////////////////////////////////-->
-    <div id="commentsSection" >
-        <h3>Comments:</h3>
-        <ul>
-            {% for comment in project.comments %}
-                <li>{{ comment.user.first_name }}: {{ comment.comment }}</li>
-            {% empty %}
-                <li>No comments yet.</li>
-            {% endfor %}
-        </ul>
+        <br>
+        <div class="text-center mt-3">
+            <button id="commentButton" class="btn btn-primary btn-comment">Comment</button>
+            <button id="rateButton" class="btn btn-success">Rate</button>
+            <a href="{% url 'view_projects' %}" class="btn btn-success btn-donate">Back to all projects</a>
+            <a href="{% url 'report_project' project.id  %}" class="btn btn-success btn-donate">Report</a>
+        </div>
+        {% if can_delete %}
+            <a href="{% url 'delete_project' project.id %}" class="btn btn-success btn-donate">Delete</a>
+        {% endif %}
     </div>
     
-
-    <h1 class="text-center mb-4">Projects with similar tags</h1>
-    <div class="row">
-        {% for pro in matching_projects %}
-        <div class="col-md-4 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <h2 class="card-title">{{ pro.title }}</h2>
-                    <p class="card-text">{{ pro.details }}</p>
-                    <p class="card-text">Category: {{ pro.category.name }}</p>
-                    <h3>Tags:</h3>
-                    <ul class="list-unstyled">
-                        {% for tag in pro.tags.all %}
-                        <li>{{ tag.name }}</li>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <div id="carousel-{{ project.id }}" class="carousel slide" data-ride="carousel">
+                    <!-- Indicators -->
+                    <ol class="carousel-indicators">
+                        {% for image in project.image_set.all %}
+                        <li data-target="#carousel-{{ project.id }}" data-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active"{% endif %}></li>
                         {% endfor %}
-                    </ul>
-                    <div class="text-center mt-3">
-                        <a href="{% url 'project_page' pro.id %}" class="btn btn-primary btn-comment">View Project</a>
+                    </ol>
+                    
+                    <!-- Wrapper for slides -->
+                    <div class="carousel-inner" style="height: 300px; overflow: hidden;">
+                        {% for image in project.image_set.all %}
+                        <div class="item {% if forloop.first %}active{% endif %}" style="height: 100%;">
+                            <img src="{{ image.file.url }}" alt="{{ project.title }}" style="width:100%; height: 100%; object-fit: cover;">
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Left and right controls -->
+                    <a class="left carousel-control" href="#carousel-{{ project.id }}" data-slide="prev">
+                        <span class="glyphicon glyphicon-chevron-left"></span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                    <a class="right carousel-control" href="#carousel-{{ project.id }}" data-slide="next">
+                        <span class="glyphicon glyphicon-chevron-right"></span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </div>
+            </div>
+            <!-- Donation form -->
+            <div class="card-footer">
+                <div class="alert alert-info" role="alert">
+                    Total Donated: {{ project.totalDonate }}
+                </div>
+                {% if project.totalDonate > project.total %}
+                    <div class="alert alert-danger" role="alert">
+                        Donation exceeds project total!
+                    </div>
+                {% endif %}
+                
+                <h3>Make a Donation</h3>
+                <form method="post" action="{% url 'donate' id=project.id %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="amount">Amount:</label>
+                        <input type="text" class="form-control" id="amount" name="amount" placeholder="Enter amount">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Donate</button>
+                </form>
+            </div>
+            <!-- Donation progress -->
+            <div class="card-footer">
+                <h3>Donation Progress</h3>
+                <div class="progress">
+                    <div id="donate-progress" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="{{ project.total }}" style="width: 0%">
+                        0 of {{ project.total }}
                     </div>
                 </div>
+                
+            </div>
+            
+            <div id="ratingFormContainer" style="display:none;">
+                    {% include 'projects/rate.html' %}
+            </div>
 
-                <div class="card-footer">
+            <div id="commentFormContainer" style="display:none;">
+                {% include 'projects/comment.html' %}
+        </div>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- ///////////////////////////comments show////////////////////////////////-->
+<div id="commentsSection" >
+    <h3>Comments:</h3>
+    <ul>
+        {% for comment in project.comments %}
+            <li>{{ comment.user.first_name }}: {{ comment.comment }}</li>
+        {% empty %}
+            <li>No comments yet.</li>
+        {% endfor %}
+    </ul>
+</div>
+
+<h1 class="text-center mb-4">Projects with similar tags</h1>
+<div class="row">
+    {% for pro in matching_projects %}
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title">{{ pro.title }}</h2>
+                <p class="card-text">{{ pro.details }}</p>
+                <p class="card-text">Category: {{ pro.category.name }}</p>
+                <h3>Tags:</h3>
+                <ul class="list-unstyled">
+                    {% for tag in pro.tags.all %}
+                    <li>{{ tag.name }}</li>
+                    {% endfor %}
+                </ul>
+                <div class="text-center mt-3">
+                    <a href="{% url 'project_page' pro.id %}" class="btn btn-primary btn-comment">View Project</a>
+                </div>
+            </div>
+
+            <div class="card-footer">
+                
+                <div id="carousel-{{ project.id }}" class="carousel slide" data-ride="carousel" >
+                    <!-- Indicators -->
+                    <ol class="carousel-indicators">
+                        {% for image in pro.image_set.all %}
+                        <li data-target="#carousel-{{ project.id }}" data-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active"{% endif %}></li>
+                        {% endfor %}
+                    </ol>
                     
-                    <div id="carousel-{{ project.id }}" class="carousel slide" data-ride="carousel">
-                        <!-- Indicators -->
-                        <ol class="carousel-indicators">
-                            {% for image in pro.image_set.all %}
-                            <li data-target="#carousel-{{ project.id }}" data-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active"{% endif %}></li>
-                            {% endfor %}
-                        </ol>
-                        
-                        <!-- Wrapper for slides -->
-                        <div class="carousel-inner">
-                            {% for image in pro.image_set.all %}
-                            <div class="item {% if forloop.first %}active{% endif %}">
-                                <img src="{{ image.file.url }}" alt="{{ project.title }}" style="width:100%;">
-                            </div>
-                            {% endfor %}
+                    <!-- Wrapper for slides -->
+                    <div class="carousel-inner">
+                        {% for image in pro.image_set.all %}
+                        <div class="item {% if forloop.first %}active{% endif %}">
+                            <img src="{{ image.file.url }}" alt="{{ project.title }}" style="width:100%;">
                         </div>
-
-                        <!-- Left and right controls -->
-                        <a class="left carousel-control" href="#carousel-{{ project.id }}" data-slide="prev">
-                            <span class="glyphicon glyphicon-chevron-left"></span>
-                            <span class="sr-only">Previous</span>
-                        </a>
-                        <a class="right carousel-control" href="#carousel-{{ project.id }}" data-slide="next">
-                            <span class="glyphicon glyphicon-chevron-right"></span>
-                            <span class="sr-only">Next</span>
-                        </a>
+                        {% endfor %}
                     </div>
+
+                    <!-- Left and right controls -->
+                    <a class="left carousel-control" href="#carousel-{{ project.id }}" data-slide="prev">
+                        <span class="glyphicon glyphicon-chevron-left"></span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                    <a class="right carousel-control" href="#carousel-{{ project.id }}" data-slide="next">
+                        <span class="glyphicon glyphicon-chevron-right"></span>
+                        <span class="sr-only">Next</span>
+                    </a>
                 </div>
             </div>
         </div>
-    
-        {% endfor %}
     </div>
-    
-    <div id="commentForm" style="display: none;">
-        <form action="{% url 'add_comment' project.id %}" method="POST">
-            {% csrf_token %}
-            <div>
-                <label for="comment">Add your comment:</label>
-                <br>
-                <textarea id="comment" name="comment" rows="4" cols="50"></textarea>
-            </div>
-            <br>
-            <input type="submit" value="Submit Review" class="btn btn-primary">
-        </form>
-    </div>
-    
-    </div>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    {% endfor %}
+</div>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function() {
     // Function to update progress bar width
@@ -233,10 +227,10 @@
         updateProgressBar();
     });
 
-    // Click event handler for comment button
-    $(".btn-comment").click(function(event) {
-        showForm('commentForm'); // Show the comment form
-    });
+    document.getElementById('commentButton').onclick = function() {
+    var formContainer = document.getElementById('commentFormContainer');
+    formContainer.style.display = 'block'; // Show the form
+    };
 
     document.getElementById('rateButton').onclick = function() {
     var formContainer = document.getElementById('ratingFormContainer');
@@ -247,3 +241,6 @@
 
 </script>
 {% endblock %}  
+
+
+
