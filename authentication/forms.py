@@ -17,18 +17,18 @@ class UserModelForm(forms.ModelForm):
     confirm_password = forms.CharField(max_length=100, widget=forms.PasswordInput)
     password = forms.CharField(max_length=100, widget=forms.PasswordInput)
     # is_admin = forms.BooleanField(label='Is Admin', required=False, widget=forms.CheckboxInput)
-    is_admin = forms.BooleanField(label='Is Admin', required=False)
+    # is_admin = forms.BooleanField(label='Is Admin', required=False)
 
     class Meta:
         model  = CustomUser
-        fields= ('first_name', 'last_name', 'email', 'username', 'password','confirm_password','mobile_phone','profile_picture','is_admin')
+        fields= ('first_name', 'last_name', 'email', 'username', 'password','confirm_password','mobile_phone','profile_picture')
     
     # def __init__(self, *args, **kwargs):
     #     super().__init__(*args, **kwargs)
     #     self.fields['is_admin'].widget.attrs['class'] = 'form-check-input'   
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['is_admin'].widget.attrs.update({'class': 'checkbox'})
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #     self.fields['is_admin'].widget.attrs.update({'class': 'checkbox'})
          
     def clean_password(self):
         password = self.cleaned_data.get('password')
@@ -60,7 +60,6 @@ class UserModelForm(forms.ModelForm):
         user = super().save(commit=False)
         user.password = make_password(self.cleaned_data["password"])
         user.confirm_password = make_password(self.cleaned_data["confirm_password"])
-        user.is_admin = self.cleaned_data['is_admin']
         if commit:
             user.save()
         return user
