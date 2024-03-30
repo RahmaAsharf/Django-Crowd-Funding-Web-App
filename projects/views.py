@@ -3,9 +3,12 @@ from django.http import HttpResponse
 from projects.models import Project,Image, Tag, Category, Rating, Report, Donation
 from projects.forms import DonationForm, ProjectForm, RatingForm, CommentForm, RatingForm , ReportForm
 from decimal import Decimal
-from django.utils import timezone
 from django.http import HttpResponseRedirect
+from django.shortcuts import render
+from django.utils import timezone
+from django.db.models import Avg
 from django.contrib.auth.decorators import login_required
+from django.utils import timezone
 
 @login_required(login_url='/authentication/login/')
 def create_project(request):
@@ -152,14 +155,6 @@ def donate(request, id):
         'donation_form': donation_form,
     }
     return render(request, 'projects/project_page.html', context)   
-
-def top_projects(request):
-
-    today = timezone.now().date()
-    running_projects = Project.objects.filter(startDate__lte=today,endDate__gte=today)
-    print(running_projects)
-    sorted_projects = sorted(running_projects, key=lambda x: x.averageReview(), reverse=True)[:2]
-    return render(request, 'projects/home.html', {'top_projects': sorted_projects})
       
 @login_required(login_url='/authentication/login/')
 def report_project(request, id):
@@ -184,13 +179,11 @@ def view_all_reports(request, id):
     return render(request, 'projects/view_reports.html', {'all_reports': all_reports , "id":id })
 
 def top_projects(request):
-
-    today = timezone.now().date()
-    running_projects = Project.objects.filter(startDate__lte=today,endDate__gte=today)
-    print(running_projects)
-    sorted_projects = sorted(running_projects, key=lambda x: x.averageReview(), reverse=True)[:2]
-    return render(request, 'projects/home.html', {'top_projects': sorted_projects})
-
+    today = timezone.now()
+    running_projects = Project.objects.filter(startDate__lte=today)
+    sorted_projects = sorted(running_projects, key=lambda x: x.averageReview(), reverse=True)[:5]
+    latest_projects = Project.objects.order_by('-created_at')[:5]
+    return render(request, 'projects/home.html', {'top_projects': sorted_projects,'latest_projects': latest_projects})
 # *************************\ View Pojects & Donations for only Logged in User /*************************
 @login_required(login_url='/authentication/login/')
 def view_user_projects(request):

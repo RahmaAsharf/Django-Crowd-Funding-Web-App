@@ -59,7 +59,7 @@ class Project(models.Model):
     def totalDonate(self):
         return sum(donation.amount for donation in self.donation_set.all())
 
-        
+          
 class Image(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     file=models.FileField()
