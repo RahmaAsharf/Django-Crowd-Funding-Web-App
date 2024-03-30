@@ -82,9 +82,10 @@
                         <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
                         <li class="nav-item"><a class="nav-link" href="{% url 'create_project' %}">Add new project</a></li>
                         <li class="nav-item"><a class="nav-link" href="{% url 'view_projects' %}">Projects</a></li>
+                        {% if user.is_authenticated and user.is_admin %}
                         <li class="nav-item"><a class="nav-link" href="{% url 'create_category' %}">Add Category</a></li>
                         <li class="nav-item"><a class="nav-link" href="{% url 'project_list' %}">Choose featured projects</a></li>
-                        
+                        {% endif %}
                         <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
                     </ul>
 
@@ -105,6 +106,7 @@
                         {% csrf_token %}
                         <button type="submit" class="btn btn-danger ml-2">Logout</button>
                     </form>
+
                     {% else %}
                     <div class="d-flex align-items-center">
                         <a class="btn btn-primary mr-2" href="{% url 'register' %}">Register</a>
