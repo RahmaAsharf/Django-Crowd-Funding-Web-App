@@ -1,6 +1,6 @@
 from django import forms
 from projects.models import Project
-from .models import Donation, Tag, Category, Rating , Report
+from .models import Donation, Tag, Category, Report, Rating, Comment
 from django.core.exceptions import ValidationError
 from datetime import datetime
 from django.shortcuts import get_object_or_404
@@ -35,15 +35,15 @@ class ProjectForm(forms.ModelForm):
         
         return end_date
 
-
+        
 class RatingForm(forms.ModelForm):
     class Meta:
         model = Rating
-        fields = [ 'rating']
+        fields = ['rating']
 
 class CommentForm(forms.ModelForm):
     class Meta:
-        model = Rating
+        model = Comment
         fields = ['comment']
 
 
@@ -67,8 +67,6 @@ class DonationForm(forms.ModelForm):
                 raise forms.ValidationError("Donation amount exceeds project's funding goal.")
         return amount
     
-
-
 class ReportForm(forms.ModelForm):
     status_ = (('Hateful Speech','Hateful Speech'),('Profanity', 'Profanity'),
                 ('Abuse', 'Abuse'),('Violence','Violence'),
@@ -79,6 +77,11 @@ class ReportForm(forms.ModelForm):
     class Meta:
         model = Report
         fields = ['reason','status']
+
+class CategoryForm(forms.ModelForm):
+    class Meta:
+        model = Category
+        fields = ['name']
 
     # def clean(self):
     #     cleaned_data = super().clean()

@@ -39,7 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'authentication.apps.AuthenticationConfig',
     'projects.apps.ProjectsConfig',
+    'my_admin.apps.MyAdminConfig',
     'django_cleanup.apps.CleanupConfig',
+    
 ]
 
 MIDDLEWARE = [

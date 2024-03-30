@@ -27,6 +27,7 @@ class Project(models.Model):
     startDate = models.DateField() 
     endDate = models.DateField()
     tags = models.ManyToManyField(Tag)
+    isFeatured = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
 
@@ -58,6 +59,8 @@ class Project(models.Model):
     
     def totalDonate(self):
         return sum(donation.amount for donation in self.donation_set.all())
+    
+
 
           
 class Image(models.Model):
@@ -82,10 +85,18 @@ class Image(models.Model):
 class Rating(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    comment = models.TextField(max_length=500, null=True)
-    rating = models.FloatField(null=True)
+    rating = models.FloatField()
+
+
+    def __str__(self):
+        return self.subject
+    
+class Comment(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    comment = models.TextField(max_length=500)
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+
 
     def __str__(self):
         return self.subject

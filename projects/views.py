@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect , get_object_or_404
 from django.http import HttpResponse
-from projects.models import Project,Image, Tag, Category, Rating, Report, Donation
-from projects.forms import DonationForm, ProjectForm, RatingForm, CommentForm, RatingForm , ReportForm
+from projects.models import Project,Image, Tag, Category, Rating, Comment,  Report, Donation
+from projects.forms import DonationForm, ProjectForm, RatingForm , CommentForm, ReportForm
 from decimal import Decimal
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -102,32 +102,36 @@ def delete_project(request, id):
     return render(request, 'projects/delete.html', {'project': project})
 
 
-
-def add_rate(request, project_id):
-    url = request.META.get('HTTP_REFERER')
+@login_required(login_url='/authentication/login/')
+def add_rate(request,id):
     if request.method == 'POST':
         form = RatingForm(request.POST)
         if form.is_valid():
             data = form.save(commit=False)
-            data.project_id = project_id
+            data.project_id = id
             data.user_id = request.user.id  
             data.save()
-            return redirect(url)
-        # error retuen
-    return redirect(url)
+            return redirect('project_page', id=id)
+    return render(request, 'projects/rate.html',context={"form":form})
 
-def add_comment(request, project_id):
-    url = request.META.get('HTTP_REFERER')
+@login_required(login_url='/authentication/login/')
+def add_comment(request, id):
     if request.method == 'POST':
         form = CommentForm(request.POST)
         if form.is_valid():
             data = form.save(commit=False)
-            data.project_id = project_id
+            data.project_id = id
             data.user_id = request.user.id
             data.save()
-            return redirect(url)
-        # error retuen
-    return redirect(url)
+            # Redirect to the project page after successfully adding comment
+            return redirect('project_page', id=id)
+        else:
+            # Print form errors to debug
+            print(form.errors)
+    else:
+        form = CommentForm()
+    return render(request, 'projects/project_page.html', {'form': form})
+
 
 
 @login_required(login_url='/authentication/login/')
