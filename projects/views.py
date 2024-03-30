@@ -7,6 +7,8 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.utils import timezone
 from django.db.models import Avg
+from django.db.models import Q
+
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 
@@ -180,10 +182,11 @@ def view_all_reports(request, id):
 
 def top_projects(request):
     today = timezone.now()
-    running_projects = Project.objects.filter(startDate__lte=today)
+    running_projects = Project.objects.filter(endDate__gte=today)
     sorted_projects = sorted(running_projects, key=lambda x: x.averageReview(), reverse=True)[:5]
     latest_projects = Project.objects.order_by('-created_at')[:5]
     return render(request, 'projects/home.html', {'top_projects': sorted_projects,'latest_projects': latest_projects})
+
 # *************************\ View Pojects & Donations for only Logged in User /*************************
 @login_required(login_url='/authentication/login/')
 def view_user_projects(request):
@@ -194,6 +197,18 @@ def view_user_projects(request):
 def view_user_donations(request):
     user_donations = Donation.objects.filter(user=request.user)
     return render(request, 'projects/view_user_donations.html', {'user_donations': user_donations})
+
+# *************************\ Search projects by title or tag /*************************
+from django.contrib import messages
+
+def search_projects(request):
+    query = request.GET.get('search_query')
+    if not query:
+        messages.warning(request, 'Please enter a search query.')
+        return render(request, 'projects/search.html')
+
+    projects = Project.objects.filter(Q(title__icontains=query) | Q(tags__name__icontains=query)).distinct()
+    return render(request, 'projects/search.html', {'projects': projects, 'query': query})
 
 
 
