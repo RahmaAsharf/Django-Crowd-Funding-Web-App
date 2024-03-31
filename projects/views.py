@@ -8,6 +8,7 @@ from django.shortcuts import render
 from django.utils import timezone
 from django.db.models import Avg
 from django.db.models import Q
+from datetime import datetime
 
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
@@ -47,6 +48,7 @@ def view_projects(request):
 def project_page(request, id):
     project = Project.objects.get(id=id)
     projects = Project.objects.all()
+    expiredate=project.endDate
     report_elements= Report.objects.filter(project_id=id)
     report_count =0
     for report in report_elements:
@@ -57,6 +59,7 @@ def project_page(request, id):
     projectOwner= request.user.id 
 
     can_delete = False
+    notexpired =True
     
     # Check if the current user is the creator of the project
     if project.user_id == projectOwner:
@@ -67,8 +70,17 @@ def project_page(request, id):
         if project.totalDonate() < quarter_total:
             can_delete = True
 
+
+    if expiredate < datetime.now().date():
+        notexpired = False
+    else:
+        notexpired =True
+
+
+
     matching_projects = []
     unique_project_ids = set()
+
 
     for mytag in project.tags.all():
         for pro in projects:
@@ -83,7 +95,7 @@ def project_page(request, id):
                         
                         break  # Break out of the inner loop
             
-    return render(request, 'projects/project_page.html', {'project': project, 'can_delete': can_delete , 'matching_projects': matching_projects , 'report_count':report_count, 'projectOwner':projectOwner})
+    return render(request, 'projects/project_page.html', {'project': project, 'can_delete': can_delete , 'matching_projects': matching_projects , 'report_count':report_count, 'projectOwner':projectOwner,'notexpired':notexpired})
 
 # def delete_conditions(request, id):
 #     project = Project.objects.get(id=id)
@@ -165,6 +177,12 @@ def add_comment(request, project_id):
 @login_required(login_url='/authentication/login/')
 def donate(request, id):
     project = get_object_or_404(Project, pk=id)
+    expiredate=project.endDate
+    notexpired =True
+    if expiredate < datetime.now().date():
+        notexpired = False
+    else:
+        notexpired =True
     if request.method == 'POST':
         donation_form = DonationForm(request.POST,project_id=id)
         if donation_form.is_valid():
@@ -178,8 +196,11 @@ def donate(request, id):
             context = {
                 'project': project,
                 'donation_form': donation_form,
+                'notexpired':notexpired
+
             }
             return render(request, 'projects/project_page.html', context)
+             
     else:
         donation_form = DonationForm()
     context = {
