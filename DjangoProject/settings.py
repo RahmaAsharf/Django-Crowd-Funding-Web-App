@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'authentication.apps.AuthenticationConfig',
     'projects.apps.ProjectsConfig',
     'django_cleanup.apps.CleanupConfig',
+    'my_admin.apps.MyAdminConfig'
 ]
 
 MIDDLEWARE = [

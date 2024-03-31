@@ -62,7 +62,7 @@ class Project(models.Model):
           
 class Image(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    file=models.FileField()
+    file=models.FileField(blank=False)
 
     def __str__(self):
          return str(self.file)
