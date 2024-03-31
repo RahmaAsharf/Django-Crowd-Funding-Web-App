@@ -39,9 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'authentication.apps.AuthenticationConfig',
     'projects.apps.ProjectsConfig',
-    'my_admin.apps.MyAdminConfig',
     'django_cleanup.apps.CleanupConfig',
-    
 ]
 
 MIDDLEWARE = [
@@ -52,7 +50,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'authentication.middleware.CheckUserIdMiddleware',
+    # 'authentication.middleware.CheckUserIdMiddleware',
 ]
 
 ROOT_URLCONF = 'DjangoProject.urls'
@@ -152,4 +150,3 @@ DEFAULT_FROM_EMAIL = 'guihadyosry@gmail.com'  # Replace with the default sender 
 DOMAIN = 'http://127.0.0.1:8082'  
 
 AUTH_USER_MODEL = 'authentication.CustomUser'
-

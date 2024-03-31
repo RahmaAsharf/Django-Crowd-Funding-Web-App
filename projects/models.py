@@ -27,7 +27,6 @@ class Project(models.Model):
     startDate = models.DateField() 
     endDate = models.DateField()
     tags = models.ManyToManyField(Tag)
-    isFeatured = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
 
@@ -55,12 +54,10 @@ class Project(models.Model):
         return count
     
     def comments(self):
-        return Rating.objects.filter(project=self.id).exclude(comment__isnull=True)
+        return Comment.objects.filter(project=self.id).exclude(comment__isnull=True)
     
     def totalDonate(self):
         return sum(donation.amount for donation in self.donation_set.all())
-    
-
 
           
 class Image(models.Model):
@@ -85,22 +82,23 @@ class Image(models.Model):
 class Rating(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    rating = models.FloatField()
-
+    rating = models.FloatField(null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.subject
-    
+
+
 class Comment(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    comment = models.TextField(max_length=500)
+    comment = models.TextField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-
     def __str__(self):
-        return self.subject
-    
+        return self.subject    
+
+
     
 class Donation(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
@@ -117,6 +115,7 @@ class Report(models.Model):
     status=models.CharField(max_length=15)
     project = models.ForeignKey(Project,on_delete=models.CASCADE, related_name='reports')
     user =models.ForeignKey(CustomUser,on_delete=models.CASCADE, related_name='reports')
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name='reports', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:

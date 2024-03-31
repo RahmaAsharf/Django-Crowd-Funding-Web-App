@@ -1,9 +1,11 @@
-<form action="{% url 'add_comment' project.id %}" method="POST">
 
-    {% csrf_token %}
-    <div class="form-group">
-        <label for="id_comment">Comment:</label>
-        <textarea class="form-control" id="id_comment" name="comment" rows="4" cols="40"></textarea>
-    </div>
-    <button type="submit" class="btn btn-primary">Submit Comment</button>
-</form>
+    <form action="{% url 'add_comment' project.id %}" method="POST">
+        {% csrf_token %}
+        <div>
+            <label for="comment">Add your comment:</label>
+            <br>
+            <textarea id="comment" name="comment" rows="4" cols="40"></textarea>
+        </div>
+        <br>
+        <input type="submit" value="Submit Review" class="btn btn-primary">
+    </form>
