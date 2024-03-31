@@ -27,6 +27,7 @@ class Project(models.Model):
     startDate = models.DateField() 
     endDate = models.DateField()
     tags = models.ManyToManyField(Tag)
+    isFeatured = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
 
