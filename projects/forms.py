@@ -10,6 +10,7 @@ class ProjectForm(forms.ModelForm):
     category = forms.ModelChoiceField(queryset=Category.objects.all(), required=True, label='Category')
     tags = forms.ModelMultipleChoiceField(queryset=Tag.objects.all(), required=False, label='Tags')
 
+
     class Meta:
         model = Project
         fields = ['title', 'details', 'category', 'total', 'startDate', 'endDate', 'tags']
@@ -85,6 +86,24 @@ class CategoryForm(forms.ModelForm):
     class Meta:
         model = Category
         fields = ['name']
+
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        if Category.objects.filter(name=name).exists():
+            raise forms.ValidationError("Category with this name already exists.")
+        return name
+
+class TagForm(forms.ModelForm):
+    class Meta:
+        model = Tag
+        fields = ['name']
+
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        if Tag.objects.filter(name=name).exists():
+            raise forms.ValidationError("Tag with this name already exists.")
+        return name
+
 
     # def clean(self):
     #     cleaned_data = super().clean()

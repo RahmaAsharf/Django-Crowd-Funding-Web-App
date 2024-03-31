@@ -1,7 +1,7 @@
 {% extends 'layouts/base.html' %}
 {% load static %}
-
 {% block 'content' %}
+
 <div class="container py-3">
     <h1 class="display-6 text-center mb-5">Add New Project</h1>
     <div class="row justify-content-center">
@@ -10,13 +10,22 @@
                 <div class="card-body">
                     <form id="post_form" method="post" action="" enctype="multipart/form-data">
                         {% csrf_token %}
-                        {% for hidden in form.hidden_fields %}
-                            {{ hidden }}
-                        {% endfor %}
+                        
                         {% for field in form.visible_fields %}
                             <div class="mb-3">
                                 {{ field.label_tag }}
-                                {{ field }}
+                                {% if field.name == 'tags' %}
+                                    <select class="form-control select2" name="{{ field.name }}" multiple>
+                                        <option value="">Select or enter tags</option>
+                                        {% for tag in tags %}
+                                            <option value="{{ tag.id }}">{{ tag.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                {% elif field.name == 'startDate' or field.name == 'endDate' %}
+                                    <input type="text" class="form-control datepicker" name="{{ field.name }}" id="id_{{ field.name }}">
+                                {% else %}
+                                    {{ field }}
+                                {% endif %}
                                 {% for error in field.errors %}
                                     <span class="text-danger">{{ error }}</span>
                                 {% endfor %}
@@ -40,4 +49,44 @@
         </div>
     </div>
 </div>
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        // Initialize Select2 for multiple tags input
+        $('.select2').select2({
+            tags: true,
+            tokenSeparators: [',', ' '], // Allow multiple tags to be entered by separating them with commas or spaces
+            createTag: function (params) {
+                return {
+                    id: params.term,
+                    text: params.term,
+                    newTag: true // Add a custom property to indicate that this is a new tag
+                };
+            },
+            templateResult: function (data) {
+                var $result = $("<span></span>");
+
+                $result.text(data.text);
+
+                if (data.newTag) {
+                    $result.append(" <em>(new)</em>"); // Add (new) text for new tags
+                }
+
+                return $result;
+            }
+        });
+
+        // Initialize DatePicker for date fields
+        $('.datepicker').datepicker({
+            dateFormat: 'yy-mm-dd'  // Set the date format
+        });
+    });
+</script>
+
 {% endblock %}
