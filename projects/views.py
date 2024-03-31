@@ -201,22 +201,10 @@ def donate(request, id):
             donation.save()
             return redirect('project_page', id=id)
         else:
-            # Form validation failed, re-render context with errors
-            context = {
-                'project': project,
-                'donation_form': donation_form,
-                'notexpired':notexpired
-
-            }
-            return render(request, 'projects/project_page.html', context)
-             
+            return redirect('project_page', id=id)
     else:
-        donation_form = DonationForm()
-    context = {
-        'project': project,
-        'donation_form': donation_form,
-    }
-    return render(request, 'projects/project_page.html', context)   
+    # return render(request, 'projects/project_page.html', context)   
+        return redirect('project_page', id=id)
       
 @login_required(login_url='/authentication/login/')
 def report_project(request, id):
