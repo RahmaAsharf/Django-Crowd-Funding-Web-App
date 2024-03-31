@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect , get_object_or_404
 from django.http import HttpResponse
-from projects.models import Project,Image, Tag, Category, Rating, Report, Donation
+from projects.models import Project,Image, Tag, Category, Rating, Report, Donation , Comment
 from projects.forms import DonationForm, ProjectForm, RatingForm, CommentForm, RatingForm , ReportForm
 from decimal import Decimal
 from django.http import HttpResponseRedirect
@@ -47,13 +47,19 @@ def view_projects(request):
 def project_page(request, id):
     project = Project.objects.get(id=id)
     projects = Project.objects.all()
-    report_count = Report.objects.filter(project_id=id).count()
+    report_elements= Report.objects.filter(project_id=id)
+    report_count =0
+    for report in report_elements:
+        if report.comment_id is None :
+            report_count += 1 
+
     
+    projectOwner= request.user.id 
 
     can_delete = False
     
     # Check if the current user is the creator of the project
-    if project.user_id == 1 :
+    if project.user_id == projectOwner:
         # Convert 0.25 to Decimal and then perform multiplication
         quarter_total = project.total * Decimal('0.25')
         
@@ -77,7 +83,7 @@ def project_page(request, id):
                         
                         break  # Break out of the inner loop
             
-    return render(request, 'projects/project_page.html', {'project': project, 'can_delete': can_delete , 'matching_projects': matching_projects , 'report_count':report_count })
+    return render(request, 'projects/project_page.html', {'project': project, 'can_delete': can_delete , 'matching_projects': matching_projects , 'report_count':report_count, 'projectOwner':projectOwner})
 
 # def delete_conditions(request, id):
 #     project = Project.objects.get(id=id)
@@ -103,23 +109,37 @@ def delete_project(request, id):
        
     return render(request, 'projects/delete.html', {'project': project})
 
-
-
+@login_required(login_url='/authentication/login/')
 def add_rate(request, project_id):
-    url = request.META.get('HTTP_REFERER')
     if request.method == 'POST':
         form = RatingForm(request.POST)
         if form.is_valid():
             data = form.save(commit=False)
             data.project_id = project_id
-            data.user_id = request.user.id  
+            data.user_id = request.user.id
             data.save()
-            return redirect(url)
-        # error retuen
-    return redirect(url)
+            return redirect('project_page', id=project_id)
+        else:
+            # Handle form validation errors
+            print("Form errors:", form.errors)
+            return render(request, 'projects/errors.html', {'errors': form.errors})
+            # Render the errors.html template with form errors
+    return redirect('project_page', id=project_id)
 
+# def add_rate(request, project_id):
+#     url = request.META.get('HTTP_REFERER')
+#     if request.method == 'POST':
+#         form = RatingForm(request.POST)
+#         if form.is_valid():
+#             data = form.save(commit=False)
+#             data.project_id = project_id
+#             data.user_id = request.user.id  
+#             data.save()
+#             return redirect(url)
+#         # error retuen
+#     return redirect(url)
+@login_required(login_url='/authentication/login/')
 def add_comment(request, project_id):
-    url = request.META.get('HTTP_REFERER')
     if request.method == 'POST':
         form = CommentForm(request.POST)
         if form.is_valid():
@@ -127,9 +147,9 @@ def add_comment(request, project_id):
             data.project_id = project_id
             data.user_id = request.user.id
             data.save()
-            return redirect(url)
+            return redirect('project_page', id=project_id)
         # error retuen
-    return redirect(url)
+    return redirect('project_page', id=project_id)
 
 
 @login_required(login_url='/authentication/login/')
@@ -175,17 +195,49 @@ def report_project(request, id):
 
 #////////////////////////////////////////////////////////////////////////
 def view_all_reports(request, id):
-    # Retrieve all reports for the specified project ID
-    
+
     all_reports = Report.objects.filter(project_id=id)
     return render(request, 'projects/view_reports.html', {'all_reports': all_reports , "id":id })
 
+###############Report Comment############
+@login_required(login_url='/authentication/login/')
+def report_comment(request, project_id, comment_id):
+    if request.method == 'POST':
+        form = ReportForm(request.POST)
+        if form.is_valid():
+            report = form.save(commit=False)
+            report.project_id = project_id
+            report.user = request.user 
+
+            # Associate the report with the comment
+            report.comment_id = comment_id
+
+            report.save()
+
+            return redirect('project_page', id=project_id)  # Redirect to the project detail page
+    else:
+        form = ReportForm()
+    
+    return render(request, 'projects/reportcomment.html', {'form': form})
+################################################################################
 def top_projects(request):
     today = timezone.now()
     running_projects = Project.objects.filter(endDate__gte=today)
     sorted_projects = sorted(running_projects, key=lambda x: x.averageReview(), reverse=True)[:5]
     latest_projects = Project.objects.order_by('-created_at')[:5]
-    return render(request, 'projects/home.html', {'top_projects': sorted_projects,'latest_projects': latest_projects})
+    categories = Category.objects.all()
+    return render(request, 'projects/home.html', {'top_projects': sorted_projects,'latest_projects': latest_projects,'categories': categories})
+
+def category_projects(request, category_id):
+    category = Category.objects.get(pk=category_id)
+    catprojects = Project.objects.filter(category=category)
+    categories = Category.objects.all()
+    return render(request,'projects/catproject.html',  {'catprojects': catprojects, 'categories': categories , 'cat_name':category.name})
+
+def tag_projects(request, tag_name):
+    tag = Tag.objects.filter(name=tag_name).first()
+    tagprojects = Project.objects.filter(tags=tag) if tag else Project.objects.none()
+    return render(request, 'projects/tagproject.html', {'tagprojects': tagprojects, 'tag_name': tag_name})
 
 # *************************\ View Pojects & Donations for only Logged in User /*************************
 @login_required(login_url='/authentication/login/')

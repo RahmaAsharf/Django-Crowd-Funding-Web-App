@@ -36,17 +36,59 @@
         </thead>
         <tbody>
             {% for report in all_reports %}
+       
+            {%if report.comment_id is None%}
             <tr>
                 <td>{{ report.id }}</td> 
-                <td>{{ report.user.first_name }}</td>   <!-- Access user username -->
+                <td>{{ report.user.username}}</td>   <!-- Access user username -->
                 <td>{{ report.reason }}</td>
                 <td>{{ report.status }}</td>
                 <td>{{ report.created_at }}</td>
 
             </tr>
+            {% endif %}
             {% endfor %}
+
         </tbody>
     </table>
+ ---------------------------------------------------------------------------------------------
+
+    <h1>All Reported Comments</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Report ID</th>
+
+                <th>User Name</th>
+
+                <th>Reason</th>
+
+                <th>Status</th>
+
+                <th>Created At</th>
+
+                <th>Comment Owner</th>
+
+            </tr>
+        </thead>
+        <tbody>
+
+    {% for report in all_reports %}
+    {% if report.comment_id %}
+        <tr>
+            <td>{{ report.id }}</td> 
+            <td>{{ report.user.username }}</td>
+            <td>{{ report.reason }}</td>
+            <td>{{ report.status }}</td>
+            <td>{{ report.created_at }}</td>
+            <td>{{ report.comment.user.username }}</td>
+
+        </tr>
+    {% endif %}
+{% endfor %}
+</tbody>
+</table>
+
     
     <a href="{% url 'project_page' id%}" class="btn btn-success btn-donate">Back to project</a>
 

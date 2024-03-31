@@ -1,6 +1,7 @@
 from django import forms
 from projects.models import Project
-from .models import Donation, Tag, Category, Rating , Report
+from .models import Donation, Tag, Category, Rating , Report , Comment
+
 from django.core.exceptions import ValidationError
 from datetime import datetime
 from django.shortcuts import get_object_or_404
@@ -43,7 +44,7 @@ class RatingForm(forms.ModelForm):
 
 class CommentForm(forms.ModelForm):
     class Meta:
-        model = Rating
+        model = Comment
         fields = ['comment']
 
 
@@ -79,6 +80,11 @@ class ReportForm(forms.ModelForm):
     class Meta:
         model = Report
         fields = ['reason','status']
+
+class CategoryForm(forms.ModelForm):
+    class Meta:
+        model = Category
+        fields = ['name']
 
     # def clean(self):
     #     cleaned_data = super().clean()

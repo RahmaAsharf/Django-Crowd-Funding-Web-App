@@ -9,7 +9,7 @@
     <div class="col-md-8 mb-4">
         <div class="card">
             <div class="card-body">
-                {% if project.user_id == 1 %}
+                {% if project.user_id == projectOwner %}
                 <h5 class="card-title" style="color: red;">project has {{ report_count }} reports</h5>
                 <a href="{% url 'view_reports' project.id %}" class="btn btn-success btn-donate">View reports</a>
                 {% endif %}
@@ -23,7 +23,7 @@
                 <h3>Tags:</h3>
                 <ul class="list-unstyled">
                     {% for tag in project.tags.all %}
-                    <li>{{ tag.name }}</li>
+                    <li><a  class="tag-link" href="{% url 'tag_projects' tag.name %}">{{ tag.name }}</a></li>
                     {% endfor %}
                 </ul>
                 
@@ -47,10 +47,11 @@
             <button id="rateButton" class="btn btn-success">Rate</button>
             <a href="{% url 'view_projects' %}" class="btn btn-success btn-donate">Back to all projects</a>
             <a href="{% url 'report_project' project.id  %}" class="btn btn-success btn-donate">Report</a>
-        </div>
-        {% if can_delete %}
+            {% if can_delete %}
             <a href="{% url 'delete_project' project.id %}" class="btn btn-success btn-donate">Delete</a>
-        {% endif %}
+            {% endif %}
+        </div>
+       
     </div>
     
     <div class="col-md-4">
@@ -134,7 +135,12 @@
     <h3>Comments:</h3>
     <ul>
         {% for comment in project.comments %}
-            <li>{{ comment.user.first_name }}: {{ comment.comment }}</li>
+        
+            <li>{{ comment.user.username }}: {{ comment.comment }}</li>
+            <form method="post" action="{% url 'report_comments' project.id comment.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger" style="block-size: 25px; font-size:x-small;">Report</button>
+            </form>
         {% empty %}
             <li>No comments yet.</li>
         {% endfor %}

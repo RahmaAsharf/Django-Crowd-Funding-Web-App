@@ -97,8 +97,53 @@
     text-align: center;
     font-size: 2rem;
     margin-bottom: 30px;
+    margin-top: 20px;
     letter-spacing: 2px;
   }
+
+  .categories {
+    overflow: auto; /* Ensure horizontal scrolling for categories */
+    display: inline-block;
+  }
+
+  .categories ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .categories ul li {
+    float: left;
+    margin-right: 10px; 
+    border: 1px solid #ccc; 
+    border-radius: 5px; 
+    background-color: white;
+    width: 150px; 
+    text-align: center; 
+  }
+
+  .categories ul li a {
+    display: block;
+    color: black; 
+    text-decoration: none;
+    font-size: 18px;
+    padding: 8px 10px;
+  }
+
+.categories ul li a:hover {
+    background-color: #17a2b8; 
+    color: white; 
+}
+
+.tag-link {
+  color: white;      
+  text-decoration: none; 
+}
+
+.tag-link:hover {
+  color: white;
+  text-decoration: none; 
+}
 </style>
 
 <div id="project-carousel" class="carousel slide" data-bs-ride="carousel">
@@ -139,63 +184,75 @@
   <button type="submit" class="btn btn-info">Search</button>
 </form>
 
+<!-- Browse By Category  -->
+<h1 class="custom-heading"> Browse By Category </h1>
+<div id="cat" style="background-color: rgba(0, 0, 0, 0.1); padding: 15px; margin-top: 15px; text-align: center;">
+  <div class="categories">
+    <ul>
+      {% for category in categories %}
+        <li><a href="{% url 'category_projects' category.id %}">{{ category.name }}</a></li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+
 <!-- our latest project -->
 <h1 class="custom-heading">Our Latest Projects</h1>
 <div class="row">
   {% if latest_projects %}
-  {% for project in latest_projects %}
-  <div class="col-md-4 mb-4">
-    <div class="card">
-      <div class="card-body">
-        <h2 class="card-title">{{ project.title }}</h2>
-        <p class="card-text"><strong>Details:</strong> {{ project.details }}</p>
-        <p class="card-text"><strong>Total:</strong> {{ project.total }}</p>
-        <p class="card-text">
-          <strong>Category:</strong> {{ project.category.name }}
-        </p>
-        <div class="card-details">
-          <p class="tags-label">Tags</p>
-          <ul class="tags">
-            {% for tag in project.tags.all %}
-            <li>{{ tag.name }}</li>
-            {% endfor %}
-          </ul>
-        </div>
-        <div class="text-center mt-3">
-          <a href="{% url 'project_page' project.id %}" class="btn btn-info btn-comment" style="margin-top: 5px;">View Project</a>
-        </div>
-      </div>
-      <div class="card-footer">
-        <div id="carousel-{{ project.id }}" class="carousel slide" data-bs-ride="carousel">
-          <!-- Indicators -->
-          <ol class="carousel-indicators">
-            {% for image in project.image_set.all %}
-            <li data-bs-target="#carousel-{{ project.id }}" data-bs-slide-to="{{ forloop.counter0 }}"
-              {% if forloop.first %} class="active" {% endif %}></li>
-            {% endfor %}
-          </ol>
-          <!-- Wrapper for slides -->
-          <div class="carousel-inner" style="height: 200px;">
-            {% for image in project.image_set.all %}
-            <div class="carousel-item {% if forloop.first %}active{% endif %}" style="height: 200px;">
-              <img src="{{ image.file.url }}" alt="{{ project.title }}" style="object-fit: cover; width: 100%; height: 100%;" />
+    {% for project in latest_projects %}
+      <div class="col-md-4 mb-4">
+        <div class="card">
+          <div class="card-body">
+            <h2 class="card-title">{{ project.title }}</h2>
+            <p class="card-text"><strong>Details:</strong> {{ project.details }}</p>
+            <p class="card-text"><strong>Total:</strong> {{ project.total }}</p>
+            <p class="card-text">
+              <strong>Category:</strong> {{ project.category.name }}
+            </p>
+            <div class="card-details">
+              <p class="tags-label">Tags</p>
+              <ul class="tags">
+                {% for tag in project.tags.all %}
+                  <li><a  class="tag-link" href="{% url 'tag_projects' tag.name %}">{{ tag.name }}</a></li>
+                {% endfor %}
+              </ul>
             </div>
-            {% endfor %}
+            <div class="text-center mt-3">
+              <a href="{% url 'project_page' project.id %}" class="btn btn-info btn-comment">View Project</a>
+            </div>
           </div>
-          <!-- Left and right controls -->
-          <button class="carousel-control-prev" type="button" data-bs-target="#carousel-{{ project.id }}" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
-          </button>
-          <button class="carousel-control-next" type="button" data-bs-target="#carousel-{{ project.id }}" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
-          </button>
+          <div class="card-footer">
+            <div id="carousel-{{ project.id }}" class="carousel slide" data-bs-ride="carousel">
+              <!-- Indicators -->
+              <ol class="carousel-indicators">
+                {% for image in project.image_set.all %}
+                <li data-bs-target="#carousel-{{ project.id }}" data-bs-slide-to="{{ forloop.counter0 }}"
+                  {% if forloop.first %} class="active" {% endif %}></li>
+                {% endfor %}
+              </ol>
+              <!-- Wrapper for slides -->
+              <div class="carousel-inner" style="height: 200px;">
+                {% for image in project.image_set.all %}
+                <div class="carousel-item {% if forloop.first %}active{% endif %}" style="height: 200px;">
+                  <img src="{{ image.file.url }}" alt="{{ project.title }}" style="object-fit: cover; width: 100%; height: 100%;" />
+                </div>
+                {% endfor %}
+              </div>
+              <!-- Left and right controls -->
+              <button class="carousel-control-prev" type="button" data-bs-target="#carousel-{{ project.id }}" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+              </button>
+              <button class="carousel-control-next" type="button" data-bs-target="#carousel-{{ project.id }}" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-  {% endfor %}
+    {% endfor %}
   {% endif %}
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"></script>

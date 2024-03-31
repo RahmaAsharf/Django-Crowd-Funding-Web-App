@@ -1,0 +1,11 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block 'content' %}
+<title>Add Category</title>
+<h1>Add Category</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form }}
+    <button type="submit">Save</button>
+</form>
+{% endblock %}

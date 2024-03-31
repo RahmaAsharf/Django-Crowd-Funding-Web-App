@@ -29,6 +29,7 @@ def profile(request):
 User = get_user_model()
 
 def register(request):
+
     if request.method == 'POST':
         form = UserModelForm(request.POST, request.FILES)
         if form.is_valid():

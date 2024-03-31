@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'authentication.apps.AuthenticationConfig',
     'projects.apps.ProjectsConfig',
     'django_cleanup.apps.CleanupConfig',
+    'my_admin.apps.MyAdminConfig'
 ]
 
 MIDDLEWARE = [
@@ -150,4 +151,3 @@ DEFAULT_FROM_EMAIL = 'guihadyosry@gmail.com'  # Replace with the default sender 
 DOMAIN = 'http://127.0.0.1:8082'  
 
 AUTH_USER_MODEL = 'authentication.CustomUser'
-

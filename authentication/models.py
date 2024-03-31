@@ -24,7 +24,7 @@ class CustomUser(AbstractUser):
   birthdate = models.DateField(null=True, blank=True)
   facebook_profile = models.URLField(max_length=200, null=True, blank=True)
   country = models.CharField(max_length=100, null=True, blank=True)
-  
+
   def activate(self):
     self.is_active = True
     self.save()

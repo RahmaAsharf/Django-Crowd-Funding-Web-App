@@ -1,0 +1,17 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block 'content' %}
+    <h1>Project List</h1>
+    <form method="post" action="{% url 'feture_projects' %}">
+        {% csrf_token %}
+        <ul>
+            {% for project in projects %}
+            <li>
+                <input type="checkbox" id="project_{{ project.id }}" name="projects" value="{{ project.id }}" {% if project.isFeatured %}checked{% endif %}>
+                <label for="project_{{ project.id }}">{{ project.title }}</label>
+            </li>
+            {% endfor %}
+        </ul>
+        <button type="submit">Update Projects</button>
+    </form>
+{% endblock %}
