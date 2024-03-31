@@ -1,6 +1,6 @@
 {% extends 'layouts/base.html' %}
 {% load static %}
-{% block 'content' %}
+{% block content %}
 
 <style>
   #project-carousel {
@@ -147,11 +147,11 @@
 </style>
 
 <div id="project-carousel" class="carousel slide" data-bs-ride="carousel">
-  {% if not top_projects %}
+  {% if not featured_projects  %}
     <div class="alert alert-info text-center">There are currently no projects to display.</div>
   {% else %}
   <div class="carousel-inner">
-    {% for project in top_projects %}
+    {% for project in featured_projects  %}
     <div class="carousel-item {% if forloop.first %}active{% endif %}">
       {% with first_image=project.image_set.all|first %}
       <img src="{{ first_image.file.url }}" alt="{{ project.title }}" style="width:100%; height: 400px;" >

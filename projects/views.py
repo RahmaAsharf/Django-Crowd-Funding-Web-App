@@ -235,8 +235,9 @@ def top_projects(request):
     running_projects = Project.objects.filter(endDate__gte=today)
     sorted_projects = sorted(running_projects, key=lambda x: x.averageReview(), reverse=True)[:5]
     latest_projects = Project.objects.order_by('-created_at')[:5]
+    featured_projects = Project.objects.filter(isFeatured=True)
     categories = Category.objects.all()
-    return render(request, 'projects/home.html', {'top_projects': sorted_projects,'latest_projects': latest_projects,'categories': categories})
+    return render(request, 'projects/home.html', {'top_projects': sorted_projects,'latest_projects': latest_projects,'categories': categories,'featured_projects': featured_projects})
 
 def category_projects(request, category_id):
     category = Category.objects.get(pk=category_id)
@@ -277,6 +278,10 @@ def search_projects(request):
     projects = Project.objects.filter(Q(title__icontains=query) | Q(tags__name__icontains=query)).distinct()
     return render(request, 'projects/search.html', {'projects': projects, 'query': query})
 
+# #Show featured projects
+# def FeaturedProjects(request):
+#     featured_projects = Project.objects.filter(is_featured=True)
+#     return render(request, 'your_template.html', {'featured_projects': featured_projects})
 
 
 
