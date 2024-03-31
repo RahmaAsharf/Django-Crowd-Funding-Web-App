@@ -106,6 +106,16 @@ def delete_project(request, id):
         return redirect("view_projects") 
        
     return render(request, 'projects/delete.html', {'project': project})
+@login_required(login_url='/authentication/login/')
+def delete_comment(request,comment_id):
+        
+        comment = Comment.objects.get(id=comment_id)
+        if request.method == 'POST':
+            project_id = comment.project_id
+            comment.delete()
+            return redirect('project_page', id=project_id)
+       
+        return render(request, 'projects/delete_comment.html', {'comment': comment})
 
 @login_required(login_url='/authentication/login/')
 def add_rate(request, project_id):
@@ -246,7 +256,11 @@ def view_user_projects(request):
 def view_user_donations(request):
     user_donations = Donation.objects.filter(user=request.user)
     return render(request, 'projects/view_user_donations.html', {'user_donations': user_donations})
+@login_required(login_url='/authentication/login/')
+def user_projects(request,id):
 
+    user_projects = Project.objects.filter(user=id)
+    return render(request, 'projects/user_same_projects.html', {'user_projects': user_projects })
 
 
 
