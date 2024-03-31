@@ -218,16 +218,24 @@ def report_comment(request, project_id, comment_id):
     
     return render(request, 'projects/reportcomment.html', {'form': form})
 ################################################################################
-
-
-
-
 def top_projects(request):
     today = timezone.now()
     running_projects = Project.objects.filter(endDate__gte=today)
     sorted_projects = sorted(running_projects, key=lambda x: x.averageReview(), reverse=True)[:5]
     latest_projects = Project.objects.order_by('-created_at')[:5]
-    return render(request, 'projects/home.html', {'top_projects': sorted_projects,'latest_projects': latest_projects})
+    categories = Category.objects.all()
+    return render(request, 'projects/home.html', {'top_projects': sorted_projects,'latest_projects': latest_projects,'categories': categories})
+
+def category_projects(request, category_id):
+    category = Category.objects.get(pk=category_id)
+    catprojects = Project.objects.filter(category=category)
+    categories = Category.objects.all()
+    return render(request,'projects/catproject.html',  {'catprojects': catprojects, 'categories': categories , 'cat_name':category.name})
+
+def tag_projects(request, tag_name):
+    tag = Tag.objects.filter(name=tag_name).first()
+    tagprojects = Project.objects.filter(tags=tag) if tag else Project.objects.none()
+    return render(request, 'projects/tagproject.html', {'tagprojects': tagprojects, 'tag_name': tag_name})
 # *************************\ View Pojects & Donations for only Logged in User /*************************
 @login_required(login_url='/authentication/login/')
 def view_user_projects(request):

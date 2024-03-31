@@ -23,7 +23,7 @@
                 <h3>Tags:</h3>
                 <ul class="list-unstyled">
                     {% for tag in project.tags.all %}
-                    <li>{{ tag.name }}</li>
+                    <li><a  class="tag-link" href="{% url 'tag_projects' tag.name %}">{{ tag.name }}</a></li>
                     {% endfor %}
                 </ul>
                 
