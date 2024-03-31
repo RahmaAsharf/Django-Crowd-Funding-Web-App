@@ -2,11 +2,50 @@
 {% load static %}
 
 {% block 'content' %}
+<style>
+    .card {
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-body {
+        padding: 40px;
+    }
+
+    form {
+        margin-bottom: 0;
+    }
+
+    label {
+        font-weight: bold;
+        color: #333;
+    }
+
+    .card-header {
+        background-color: #f8f9fa;
+        border-radius: 15px 15px 0 0;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .card-title {
+        font-size: 1.5rem;
+        margin-bottom: 0;
+    }
+
+    .card-body {
+        background-color: #fff;
+    }
+
+</style>
+
 <div class="container py-3">
-    <h1 class="display-6 text-center mb-5">Add New Project</h1>
     <div class="row justify-content-center">
         <div class="col-lg-7">
             <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <h1 class="card-title text-center" style="font-size: 2rem;">Add New Project</h1>
+                </div>
                 <div class="card-body">
                     <form id="post_form" method="post" action="" enctype="multipart/form-data">
                         {% csrf_token %}
@@ -29,10 +68,10 @@
                         <!-- Image Field -->
                         <div class="mb-3">
                             <label for="id_files">Files:</label>
-                            <input type="file" name="files" id="id_files" multiple required>
+                            <input type="file" name="files" id="id_files" class="form-control" multiple required>
                         </div>
                         <div class="text-center">
-                            <button class="btn btn-primary btn-lg btn-block" type="submit" name="submit">Submit</button>
+                            <button class="btn btn-info btn-comment" type="submit" name="submit">Submit</button>
                         </div>
                     </form>
                 </div>

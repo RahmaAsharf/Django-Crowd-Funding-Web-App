@@ -12,7 +12,14 @@ class ProjectForm(forms.ModelForm):
 
     class Meta:
         model = Project
-        fields = ['title', 'details', 'category', 'total', 'startDate', 'endDate', 'tags']
+        fields = ['title', 'details', 'total', 'category', 'startDate', 'endDate', 'tags']
+        widgets = {
+            'startDate': forms.DateInput(attrs={'type': 'date'}),
+            'endDate': forms.DateInput(attrs={'type': 'date'}),
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'details': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
+            'total': forms.TextInput(attrs={'class': 'form-control'}),
+        }
 
     def clean_total(self):
         total = self.cleaned_data.get('total')
