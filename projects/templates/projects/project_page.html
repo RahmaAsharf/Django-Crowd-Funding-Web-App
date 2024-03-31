@@ -102,7 +102,8 @@
                 <p class="card-text"><strong>Start Date: </strong>{{ project.startDate }}</p>
                 <p class="card-text"><strong>End Date: </strong>{{ project.endDate }}</p>
                 <p class="card-text"><strong>Category:</strong> {{ project.category.name }}</p>
-                <p class="card-text"><strong>Owner: </strong>{{ project.user.username }}</p>
+                <p class="card-text"><strong>Owner:</p> <a href="{% url 'user_projects' project.user.id %}"></strong>{{ project.user.username }}</a>
+                
                 <p class="tags-label">Tags</p>
                 <ul class="tags">
                     {% for tag in project.tags.all %}
@@ -224,9 +225,14 @@
                 {% csrf_token %}
                 <button type="submit" class="btn btn-danger" style="block-size: 25px; font-size:x-small;">Report</button>
             </form>
-        {% empty %}
+            {% if project.user_id == projectOwner and comment.id is not none %}
+              <a href="{% url 'delete_comment' comment.id %}" class="btn btn-success btn-donate" style="block-size: 25px; font-size:x-small;">Delete</a>
+              {%endif%}
+            {% empty %}
             <li>No comments yet.</li>
-        {% endfor %}
+            
+            
+        {% endfor %}    
     </ul>
 </div>
 
