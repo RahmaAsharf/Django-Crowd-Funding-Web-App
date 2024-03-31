@@ -127,10 +127,12 @@
         </div>
         <br>
         <div class="text-center mt-3">
+            {% if notexpired %}
             <button id="commentButton" class="btn btn-info btn-comment">Comment</button>
             <button id="rateButton" class="btn btn-info">Rate</button>
-            <a href="{% url 'view_projects' %}" class="btn btn-success btn-donate">Back to all projects</a>
             <a href="{% url 'report_project' project.id  %}" class="btn btn-danger btn-donate">Report</a>
+            {% endif %}
+            <a href="{% url 'view_projects' %}" class="btn btn-success btn-donate">Back to all projects</a>
             {% if can_delete %}
             <a href="{% url 'delete_project' project.id %}" class="btn btn-danger btn-donate">Delete</a>
             {% endif %}
@@ -170,10 +172,12 @@
                 </div>
             </div>
             <!-- Donation form -->
+            
             <div class="card-footer">
                 <div class="alert alert-info" role="alert">
-                    Total Donated: {{ project.totalDonate }}
+                    Total donationProgress: {{ project.totalDonate }}
                 </div>
+                {% if notexpired %}
                 {% if project.totalDonate > project.total %}
                     <div class="alert alert-danger" role="alert">
                         Donation exceeds project total!
@@ -190,6 +194,9 @@
                     <button type="submit" class="btn btn-info">Donate</button>
                 </form>
             </div>
+            {%else%}
+            <h5>Project Is Expired!!</h5>
+            {%endif%}
             <!-- Donation progress -->
             <div class="card-footer">
                 <h5>Donation Progress</h5>
@@ -336,5 +343,4 @@
 
 </script>
 {% endblock %}  
-
 

@@ -8,6 +8,7 @@ from django.shortcuts import render
 from django.utils import timezone
 from django.db.models import Avg
 from django.db.models import Q
+from datetime import datetime
 
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
@@ -22,21 +23,14 @@ def create_project(request):
         if form.is_valid():
             project = form.save(commit=False)
             project.user_id = request.user.id
-            project.save() 
-
-            new_tags_str = request.POST.get('new_tags', '')
-            if new_tags_str:
-                new_tags = [tag.strip() for tag in new_tags_str.split(',') if tag.strip()]
-                for tag_name in new_tags:
-                    tag, created = Tag.objects.get_or_create(name=tag_name)
-                    project.tags.add(tag)  
+            project.save()
 
             for file in files:
                 new_file = Image(project=project, file=file)
                 new_file.save()
                 file_urls.append(new_file.file.url)
-
-            form.save_m2m()  
+                
+            form.save_m2m()
             return redirect('view_projects')
     else:
         form = ProjectForm()
@@ -46,8 +40,6 @@ def create_project(request):
 
     return render(request, "projects/create_project.html", {"form": form, "tags": tags, "categories": categories})
 
-
-
 def view_projects(request):
     all_projects = Project.objects.all()
     print (all_projects)
@@ -56,6 +48,7 @@ def view_projects(request):
 def project_page(request, id):
     project = Project.objects.get(id=id)
     projects = Project.objects.all()
+    expiredate=project.endDate
     report_elements= Report.objects.filter(project_id=id)
     report_count =0
     for report in report_elements:
@@ -66,6 +59,7 @@ def project_page(request, id):
     projectOwner= request.user.id 
 
     can_delete = False
+    notexpired =True
     
     # Check if the current user is the creator of the project
     if project.user_id == projectOwner:
@@ -76,8 +70,17 @@ def project_page(request, id):
         if project.totalDonate() < quarter_total:
             can_delete = True
 
+
+    if expiredate < datetime.now().date():
+        notexpired = False
+    else:
+        notexpired =True
+
+
+
     matching_projects = []
     unique_project_ids = set()
+
 
     for mytag in project.tags.all():
         for pro in projects:
@@ -92,9 +95,22 @@ def project_page(request, id):
                         
                         break  # Break out of the inner loop
             
-    return render(request, 'projects/project_page.html', {'project': project, 'can_delete': can_delete , 'matching_projects': matching_projects , 'report_count':report_count, 'projectOwner':projectOwner})
+    return render(request, 'projects/project_page.html', {'project': project, 'can_delete': can_delete , 'matching_projects': matching_projects , 'report_count':report_count, 'projectOwner':projectOwner,'notexpired':notexpired})
 
-
+# def delete_conditions(request, id):
+#     project = Project.objects.get(id=id)
+#     can_delete = False
+    
+#     # Check if the current user is the creator of the project
+#     # if request.user == project.user:
+#     if project.user_id == 1 :
+#         # Calculate 25% of the total value
+#         quarter_total = project.total * 0.25
+        
+#         # Check if donations are less than 25% of the total value
+#         if project.totalDonate() < quarter_total:
+#             can_delete = True
+#     return render(request, 'projects/view_project.html', {'project': project, 'can_delete': can_delete}
 
 @login_required(login_url='/authentication/login/')
 def delete_project(request, id):
@@ -132,6 +148,18 @@ def add_rate(request, project_id):
             # Render the errors.html template with form errors
     return redirect('project_page', id=project_id)
 
+# def add_rate(request, project_id):
+#     url = request.META.get('HTTP_REFERER')
+#     if request.method == 'POST':
+#         form = RatingForm(request.POST)
+#         if form.is_valid():
+#             data = form.save(commit=False)
+#             data.project_id = project_id
+#             data.user_id = request.user.id  
+#             data.save()
+#             return redirect(url)
+#         # error retuen
+#     return redirect(url)
 @login_required(login_url='/authentication/login/')
 def add_comment(request, project_id):
     if request.method == 'POST':
@@ -149,6 +177,12 @@ def add_comment(request, project_id):
 @login_required(login_url='/authentication/login/')
 def donate(request, id):
     project = get_object_or_404(Project, pk=id)
+    expiredate=project.endDate
+    notexpired =True
+    if expiredate < datetime.now().date():
+        notexpired = False
+    else:
+        notexpired =True
     if request.method == 'POST':
         donation_form = DonationForm(request.POST,project_id=id)
         if donation_form.is_valid():
@@ -158,19 +192,10 @@ def donate(request, id):
             donation.save()
             return redirect('project_page', id=id)
         else:
-            # Form validation failed, re-render context with errors
-            context = {
-                'project': project,
-                'donation_form': donation_form,
-            }
-            return render(request, 'projects/project_page.html', context)
+            return redirect('project_page', id=id)
     else:
-        donation_form = DonationForm()
-    context = {
-        'project': project,
-        'donation_form': donation_form,
-    }
-    return render(request, 'projects/project_page.html', context)   
+    # return render(request, 'projects/project_page.html', context)   
+        return redirect('project_page', id=id)
       
 @login_required(login_url='/authentication/login/')
 def report_project(request, id):
@@ -261,14 +286,3 @@ def search_projects(request):
 
     projects = Project.objects.filter(Q(title__icontains=query) | Q(tags__name__icontains=query)).distinct()
     return render(request, 'projects/search.html', {'projects': projects, 'query': query})
-
-# #Show featured projects
-# def FeaturedProjects(request):
-#     featured_projects = Project.objects.filter(is_featured=True)
-#     return render(request, 'your_template.html', {'featured_projects': featured_projects})
-
-
-
-
-
-
