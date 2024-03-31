@@ -1,7 +1,7 @@
 from django.shortcuts import render
-from django.http import HttpResponse
-from projects.models import Category, Project, Tag
-from projects.forms import CategoryForm , TagForm
+from django.http import HttpResponse, HttpResponseBadRequest
+from projects.models import Category, Project
+from projects.forms import CategoryForm 
 from django.shortcuts import render, redirect, get_object_or_404
 from .decorators import admin_login_required
 
@@ -49,11 +49,51 @@ def project_list(request):
     projects = Project.objects.all()
     return render(request, 'admin/projects.html', {'projects': projects})
 
+# @admin_login_required
+# def feature_projects(request):
+#     if request.method == 'POST':
+#         project_ids = request.POST.getlist('projects')
+#         Project.objects.filter(id__in=project_ids).update(isFeatured=True)
+#         return redirect('admin_home')
+    
+#     return redirect('project_list')
+
+# @admin_login_required
+# def feature_projects(request):
+#     if request.method == 'POST':
+#         project_ids = request.POST.getlist('projects')
+        
+#         # Retrieve the current user
+#         user = request.user
+        
+#         # Update the featured_projects field in the user model
+#         user.featured_projects.set(Project.objects.filter(id__in=project_ids))
+        
+#         # Update the isFeatured field in the Project model
+#         Project.objects.all().update(isFeatured=False)  # Clear previous featured status
+#         Project.objects.filter(id__in=project_ids).update(isFeatured=True)  # Update selected projects
+        
+#         return redirect('admin_home')
+from django.contrib.auth.decorators import login_required
+from .models import FeaturedProject
+
 @admin_login_required
-def feture_projects(request):
+def feature_projects(request):
     if request.method == 'POST':
         project_ids = request.POST.getlist('projects')
-        Project.objects.filter(id__in=project_ids).update(isFeatured=True)
+        user = request.user
+  
+        # Remove previous featured projects for the user
+        FeaturedProject.objects.filter(user=user).delete()
+        
+        # Add newly selected projects as featured projects for the user
+        for project_id in project_ids:
+            FeaturedProject.objects.create(user=user, project_id=project_id)
+        
+        # Update the isFeatured field in the Project model
+        Project.objects.all().update(isFeatured=False)  # Clear previous featured status
+        Project.objects.filter(id__in=project_ids).update(isFeatured=True)  # Update selected projects
+        
         return redirect('home')
     
     return redirect('project_list')

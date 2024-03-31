@@ -1,7 +1,7 @@
 {% extends 'layouts/base.html' %}
 {% load static %}
 
-{% block 'content' %}
+{% block content %}
 <style>
     .card {
         border-radius: 15px;
@@ -76,7 +76,7 @@
                         <!-- Image Field -->
                         <div class="mb-3">
                             <label for="id_files">Files:</label>
-                            <input type="file" name="files" id="id_files" class="form-control" multiple required>
+                            <input type="file" name="files" id="id_files" class="form-control" multiple required accept="image/*">
                         </div>
                         <div class="text-center">
                             <button class="btn btn-info btn-comment" type="submit" name="submit">Submit</button>
