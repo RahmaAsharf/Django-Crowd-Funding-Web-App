@@ -7,6 +7,8 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.utils import timezone
 from django.db.models import Avg
+from django.db.models import Q
+
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 
@@ -246,6 +248,7 @@ def tag_projects(request, tag_name):
     tag = Tag.objects.filter(name=tag_name).first()
     tagprojects = Project.objects.filter(tags=tag) if tag else Project.objects.none()
     return render(request, 'projects/tagproject.html', {'tagprojects': tagprojects, 'tag_name': tag_name})
+
 # *************************\ View Pojects & Donations for only Logged in User /*************************
 @login_required(login_url='/authentication/login/')
 def view_user_projects(request):
@@ -261,6 +264,19 @@ def user_projects(request,id):
 
     user_projects = Project.objects.filter(user=id)
     return render(request, 'projects/user_same_projects.html', {'user_projects': user_projects })
+
+# *************************\ Search projects by title or tag /*************************
+from django.contrib import messages
+
+def search_projects(request):
+    query = request.GET.get('search_query')
+    if not query:
+        messages.warning(request, 'Please enter a search query.')
+        return render(request, 'projects/search.html')
+
+    projects = Project.objects.filter(Q(title__icontains=query) | Q(tags__name__icontains=query)).distinct()
+    return render(request, 'projects/search.html', {'projects': projects, 'query': query})
+
 
 
 
