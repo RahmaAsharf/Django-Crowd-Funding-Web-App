@@ -10,6 +10,9 @@ from DjangoProject import settings
 from authentication.models import CustomUser
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import AuthenticationForm
+from django.utils.translation import gettext_lazy as _
+from django.contrib.auth import authenticate
 
 User = get_user_model()
 
@@ -97,3 +100,39 @@ class ChangePasswordForm(forms.Form):
         if new_password1 and new_password2 and new_password1 != new_password2:
             raise forms.ValidationError("Passwords do not match.")
         return new_password2
+
+
+
+class CustomAuthenticationForm(AuthenticationForm):
+    error_messages = {
+        'invalid_login': _("Please enter a correct username and password. Note that your account has to be activated to be able to login."),
+        'inactive': _("This account is inactive."),
+    }
+
+    def clean(self):
+        username = self.cleaned_data.get('username')
+        password = self.cleaned_data.get('password')
+        if username and password:
+                # Authenticate user
+                user = authenticate(username=username, password=password)
+                if user is not None:
+                    if not user.is_active:
+                        raise self.get_inactive_error()
+                else:
+                    # Handle invalid login
+                    raise self.get_invalid_login_error()
+
+        return super().clean()
+
+    def get_invalid_login_error(self):
+        return forms.ValidationError(
+            self.error_messages['invalid_login'],
+            code='invalid_login',
+            params={'username': self.username_field.verbose_name},
+        )
+
+    def get_inactive_error(self):
+        return forms.ValidationError(
+            self.error_messages['inactive'],
+            code='inactive',
+        )

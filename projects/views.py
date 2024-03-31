@@ -23,14 +23,21 @@ def create_project(request):
         if form.is_valid():
             project = form.save(commit=False)
             project.user_id = request.user.id
-            project.save()
+            project.save()  # Save the project before adding tags
+
+            new_tags_str = request.POST.get('new_tags', '')
+            if new_tags_str:
+                new_tags = [tag.strip() for tag in new_tags_str.split(',') if tag.strip()]
+                for tag_name in new_tags:
+                    tag, created = Tag.objects.get_or_create(name=tag_name)
+                    project.tags.add(tag)  # Associate the tag with the project
 
             for file in files:
                 new_file = Image(project=project, file=file)
                 new_file.save()
                 file_urls.append(new_file.file.url)
-                
-            form.save_m2m()
+
+            form.save_m2m()  # Save many-to-many relationships after saving the project
             return redirect('view_projects')
     else:
         form = ProjectForm()
@@ -39,6 +46,8 @@ def create_project(request):
     categories = Category.objects.all()
 
     return render(request, "projects/create_project.html", {"form": form, "tags": tags, "categories": categories})
+
+
 
 def view_projects(request):
     all_projects = Project.objects.all()
@@ -256,8 +265,9 @@ def top_projects(request):
     running_projects = Project.objects.filter(endDate__gte=today)
     sorted_projects = sorted(running_projects, key=lambda x: x.averageReview(), reverse=True)[:5]
     latest_projects = Project.objects.order_by('-created_at')[:5]
+    featured_projects = Project.objects.filter(isFeatured=True)
     categories = Category.objects.all()
-    return render(request, 'projects/home.html', {'top_projects': sorted_projects,'latest_projects': latest_projects,'categories': categories})
+    return render(request, 'projects/home.html', {'top_projects': sorted_projects,'latest_projects': latest_projects,'categories': categories,'featured_projects': featured_projects})
 
 def category_projects(request, category_id):
     category = Category.objects.get(pk=category_id)
@@ -298,6 +308,10 @@ def search_projects(request):
     projects = Project.objects.filter(Q(title__icontains=query) | Q(tags__name__icontains=query)).distinct()
     return render(request, 'projects/search.html', {'projects': projects, 'query': query})
 
+# #Show featured projects
+# def FeaturedProjects(request):
+#     featured_projects = Project.objects.filter(is_featured=True)
+#     return render(request, 'your_template.html', {'featured_projects': featured_projects})
 
 
 

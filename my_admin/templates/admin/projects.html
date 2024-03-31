@@ -1,8 +1,8 @@
 {% extends 'layouts/base.html' %}
 {% load static %}
-{% block 'content' %}
+{% block content %}
     <h1>Project List</h1>
-    <form method="post" action="{% url 'feture_projects' %}">
+    <form id="feature-projects-form" method="post" action="{% url 'feature_projects' %}">
         {% csrf_token %}
         <ul>
             {% for project in projects %}
@@ -12,6 +12,27 @@
             </li>
             {% endfor %}
         </ul>
-        <button type="submit">Update Projects</button>
+        <!-- Alert message -->
+        <div id="alert-message" style="display: none;" class="alert alert-danger"></div>
+        <!-- Submit button -->
+        <button type="submit" id="submit-button">Update Projects</button>
     </form>
+
+    <script>
+        // JavaScript code
+        document.getElementById('feature-projects-form').addEventListener('submit', function(event) {
+            // Count the number of checked projects
+            var checkedProjects = document.querySelectorAll('input[name="projects"]:checked');
+            
+            // Display alert message if more than 5 projects are checked
+            if (checkedProjects.length > 5) {
+                event.preventDefault(); // Prevent form submission
+                document.getElementById('alert-message').innerText = 'You can only select up to 5 projects as featured.';
+                document.getElementById('alert-message').style.display = 'block';
+                return false;
+            }
+        });
+    </script>
 {% endblock %}
+
+
