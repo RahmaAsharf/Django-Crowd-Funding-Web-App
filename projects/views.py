@@ -22,14 +22,21 @@ def create_project(request):
         if form.is_valid():
             project = form.save(commit=False)
             project.user_id = request.user.id
-            project.save()
+            project.save()  # Save the project before adding tags
+
+            new_tags_str = request.POST.get('new_tags', '')
+            if new_tags_str:
+                new_tags = [tag.strip() for tag in new_tags_str.split(',') if tag.strip()]
+                for tag_name in new_tags:
+                    tag, created = Tag.objects.get_or_create(name=tag_name)
+                    project.tags.add(tag)  # Associate the tag with the project
 
             for file in files:
                 new_file = Image(project=project, file=file)
                 new_file.save()
                 file_urls.append(new_file.file.url)
-                
-            form.save_m2m()
+
+            form.save_m2m()  # Save many-to-many relationships after saving the project
             return redirect('view_projects')
     else:
         form = ProjectForm()
@@ -38,6 +45,8 @@ def create_project(request):
     categories = Category.objects.all()
 
     return render(request, "projects/create_project.html", {"form": form, "tags": tags, "categories": categories})
+
+
 
 def view_projects(request):
     all_projects = Project.objects.all()

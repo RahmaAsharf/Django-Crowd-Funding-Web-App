@@ -5,8 +5,7 @@ from projects.forms import CategoryForm , TagForm
 from django.shortcuts import render, redirect, get_object_or_404
 from .decorators import admin_login_required
 
-def admin_home(request):
-    return render(request, 'admin/home.html')
+
 
 @admin_login_required
 def category_list(request):
@@ -45,43 +44,6 @@ def delete_category(request, id):
         return redirect('category_list')
     return render(request, 'delete_category.html', {'category': category})
 
-# @admin_login_required
-# def tag_list(request):
-#     tags = Tag.objects.all()
-#     return render(request, 'admin/tags.html', {'tags': tags})
-
-# @admin_login_required
-# def create_tag(request):
-#     if request.method == 'POST':
-#         form = TagForm(request.POST)
-#         if form.is_valid():
-#             form.save()
-#             return redirect('tag_list')
-#     else:
-#         form = TagForm()
-#     return render(request, 'admin/create_tag.html', {'form': form})
-
-# @admin_login_required
-# def update_tag(request, id):
-#     tag = get_object_or_404(tag, id=id)
-#     if request.method == 'POST':
-#         form = TagForm(request.POST, instance=tag)
-#         if form.is_valid():
-#             form.save()
-#             return redirect('tag_list')
-#     else:
-#         # Prepopulate the form field with the existing category name
-#         form = CategoryForm(instance=tag, initial={'name': tag.name})
-#     return render(request, 'admin/create_tag.html', {'form': form})
-
-# @admin_login_required
-# def delete_tag(request, id):
-#     tag = get_object_or_404(tag, id=id)
-#     if request.method == 'POST':
-#         tag.delete()
-#         return redirect('category_list')
-#     return render(request, 'delete_tag.html', {'tag': tag})
-
 @admin_login_required
 def project_list(request):
     projects = Project.objects.all()
@@ -92,6 +54,6 @@ def feture_projects(request):
     if request.method == 'POST':
         project_ids = request.POST.getlist('projects')
         Project.objects.filter(id__in=project_ids).update(isFeatured=True)
-        return redirect('admin_home')
+        return redirect('home')
     
     return redirect('project_list')

@@ -1,47 +1,85 @@
 {% extends 'layouts/base.html' %}
 {% load static %}
+
 {% block 'content' %}
+<style>
+    .card {
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-body {
+        padding: 40px;
+    }
+
+    form {
+        margin-bottom: 0;
+    }
+
+    label {
+        font-weight: bold;
+        color: #333;
+    }
+
+    .card-header {
+        background-color: #f8f9fa;
+        border-radius: 15px 15px 0 0;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .card-title {
+        font-size: 1.5rem;
+        margin-bottom: 0;
+    }
+
+    .card-body {
+        background-color: #fff;
+    }
+</style>
 
 <div class="container py-3">
-    <h1 class="display-6 text-center mb-5">Add New Project</h1>
     <div class="row justify-content-center">
         <div class="col-lg-7">
             <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <h1 class="card-title text-center" style="font-size: 2rem;">Add New Project</h1>
+                </div>
                 <div class="card-body">
                     <form id="post_form" method="post" action="" enctype="multipart/form-data">
                         {% csrf_token %}
-                        
-                        {% for field in form.visible_fields %}
-                            <div class="mb-3">
-                                {{ field.label_tag }}
-                                {% if field.name == 'tags' %}
-                                    <select class="form-control select2" name="{{ field.name }}" multiple>
-                                        <option value="">Select or enter tags</option>
-                                        {% for tag in tags %}
-                                            <option value="{{ tag.id }}">{{ tag.name }}</option>
-                                        {% endfor %}
-                                    </select>
-                                {% elif field.name == 'startDate' or field.name == 'endDate' %}
-                                    <input type="text" class="form-control datepicker" name="{{ field.name }}" id="id_{{ field.name }}">
-                                {% else %}
-                                    {{ field }}
-                                {% endif %}
-                                {% for error in field.errors %}
-                                    <span class="text-danger">{{ error }}</span>
-                                {% endfor %}
-                                {% if field.help_text %}
-                                    <small class="form-text text-muted">{{ field.help_text }}</small>
-                                {% endif %}
-                            </div>
+                        {% for hidden in form.hidden_fields %}
+                        {{ hidden }}
                         {% endfor %}
-
+                        {% for field in form.visible_fields %}
+                        <div class="mb-3">
+                            {{ field.label_tag }}
+                            {% if field.name == 'tags' %}
+                            <select class="form-control" name="tags" multiple>
+                                {% for tag in tags %}
+                                <option value="{{ tag.id }}">{{ tag.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <small class="form-text text-muted">Or enter new tags separated by commas</small>
+                            <input type="text" name="new_tags" class="form-control mt-2" placeholder="Enter new tags">
+                            {% else %}
+                            {{ field }}
+                            {% endif %}
+                            {% for error in field.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                            {% if field.help_text %}
+                            <small class="form-text text-muted">{{ field.help_text }}</small>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
                         <!-- Image Field -->
                         <div class="mb-3">
                             <label for="id_files">Files:</label>
-                            <input type="file" name="files" id="id_files" multiple required>
+                            <input type="file" name="files" id="id_files" class="form-control" multiple required>
                         </div>
                         <div class="text-center">
-                            <button class="btn btn-primary btn-lg btn-block" type="submit" name="submit">Submit</button>
+                            <button class="btn btn-info btn-comment" type="submit" name="submit">Submit</button>
                         </div>
                     </form>
                 </div>
@@ -49,44 +87,4 @@
         </div>
     </div>
 </div>
-
-<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-
-<script>
-    $(document).ready(function() {
-        // Initialize Select2 for multiple tags input
-        $('.select2').select2({
-            tags: true,
-            tokenSeparators: [',', ' '], // Allow multiple tags to be entered by separating them with commas or spaces
-            createTag: function (params) {
-                return {
-                    id: params.term,
-                    text: params.term,
-                    newTag: true // Add a custom property to indicate that this is a new tag
-                };
-            },
-            templateResult: function (data) {
-                var $result = $("<span></span>");
-
-                $result.text(data.text);
-
-                if (data.newTag) {
-                    $result.append(" <em>(new)</em>"); // Add (new) text for new tags
-                }
-
-                return $result;
-            }
-        });
-
-        // Initialize DatePicker for date fields
-        $('.datepicker').datepicker({
-            dateFormat: 'yy-mm-dd'  // Set the date format
-        });
-    });
-</script>
-
 {% endblock %}
