@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseBadRequest
-from projects.models import Category, Project
-from projects.forms import CategoryForm 
+from projects.models import Category, Project, Tag
+from projects.forms import CategoryForm ,TagForm
 from django.shortcuts import render, redirect, get_object_or_404
 from .decorators import admin_login_required
 
@@ -45,35 +45,47 @@ def delete_category(request, id):
     return render(request, 'delete_category.html', {'category': category})
 
 @admin_login_required
+def tag_list(request):
+    tags = Tag.objects.all()
+    return render(request, 'admin/tags.html', {'tags': tags})
+
+@admin_login_required
+def create_tag(request):
+    if request.method == 'POST':
+        form = TagForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('tag_list')
+    else:
+        form = TagForm()
+    return render(request, 'admin/create_tag.html', {'form': form})
+
+@admin_login_required
+def update_tag(request, id):
+    tag = get_object_or_404(tag, id=id)
+    if request.method == 'POST':
+        form = TagForm(request.POST, instance=tag)
+        if form.is_valid():
+            form.save()
+            return redirect('tag_list')
+    else:
+
+        form = CategoryForm(instance=tag, initial={'name': tag.name})
+    return render(request, 'admin/create_tag.html', {'form': form})
+
+@admin_login_required
+def delete_tag(request, id):
+    tag = get_object_or_404(tag, id=id)
+    if request.method == 'POST':
+        tag.delete()
+        return redirect('category_list')
+    return render(request, 'delete_tag.html', {'tag': tag})
+
+@admin_login_required
 def project_list(request):
     projects = Project.objects.all()
     return render(request, 'admin/projects.html', {'projects': projects})
 
-# @admin_login_required
-# def feature_projects(request):
-#     if request.method == 'POST':
-#         project_ids = request.POST.getlist('projects')
-#         Project.objects.filter(id__in=project_ids).update(isFeatured=True)
-#         return redirect('admin_home')
-    
-#     return redirect('project_list')
-
-# @admin_login_required
-# def feature_projects(request):
-#     if request.method == 'POST':
-#         project_ids = request.POST.getlist('projects')
-        
-#         # Retrieve the current user
-#         user = request.user
-        
-#         # Update the featured_projects field in the user model
-#         user.featured_projects.set(Project.objects.filter(id__in=project_ids))
-        
-#         # Update the isFeatured field in the Project model
-#         Project.objects.all().update(isFeatured=False)  # Clear previous featured status
-#         Project.objects.filter(id__in=project_ids).update(isFeatured=True)  # Update selected projects
-        
-#         return redirect('admin_home')
 from django.contrib.auth.decorators import login_required
 from .models import FeaturedProject
 
@@ -82,17 +94,14 @@ def feature_projects(request):
     if request.method == 'POST':
         project_ids = request.POST.getlist('projects')
         user = request.user
-  
-        # Remove previous featured projects for the user
+
         FeaturedProject.objects.filter(user=user).delete()
         
-        # Add newly selected projects as featured projects for the user
         for project_id in project_ids:
             FeaturedProject.objects.create(user=user, project_id=project_id)
         
-        # Update the isFeatured field in the Project model
-        Project.objects.all().update(isFeatured=False)  # Clear previous featured status
-        Project.objects.filter(id__in=project_ids).update(isFeatured=True)  # Update selected projects
+        Project.objects.all().update(isFeatured=False)  
+        Project.objects.filter(id__in=project_ids).update(isFeatured=True)  
         
         return redirect('home')
     

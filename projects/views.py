@@ -22,21 +22,21 @@ def create_project(request):
         if form.is_valid():
             project = form.save(commit=False)
             project.user_id = request.user.id
-            project.save()  # Save the project before adding tags
+            project.save() 
 
             new_tags_str = request.POST.get('new_tags', '')
             if new_tags_str:
                 new_tags = [tag.strip() for tag in new_tags_str.split(',') if tag.strip()]
                 for tag_name in new_tags:
                     tag, created = Tag.objects.get_or_create(name=tag_name)
-                    project.tags.add(tag)  # Associate the tag with the project
+                    project.tags.add(tag)  
 
             for file in files:
                 new_file = Image(project=project, file=file)
                 new_file.save()
                 file_urls.append(new_file.file.url)
 
-            form.save_m2m()  # Save many-to-many relationships after saving the project
+            form.save_m2m()  
             return redirect('view_projects')
     else:
         form = ProjectForm()
@@ -94,20 +94,7 @@ def project_page(request, id):
             
     return render(request, 'projects/project_page.html', {'project': project, 'can_delete': can_delete , 'matching_projects': matching_projects , 'report_count':report_count, 'projectOwner':projectOwner})
 
-# def delete_conditions(request, id):
-#     project = Project.objects.get(id=id)
-#     can_delete = False
-    
-#     # Check if the current user is the creator of the project
-#     # if request.user == project.user:
-#     if project.user_id == 1 :
-#         # Calculate 25% of the total value
-#         quarter_total = project.total * 0.25
-        
-#         # Check if donations are less than 25% of the total value
-#         if project.totalDonate() < quarter_total:
-#             can_delete = True
-#     return render(request, 'projects/view_project.html', {'project': project, 'can_delete': can_delete}
+
 
 @login_required(login_url='/authentication/login/')
 def delete_project(request, id):
@@ -145,18 +132,6 @@ def add_rate(request, project_id):
             # Render the errors.html template with form errors
     return redirect('project_page', id=project_id)
 
-# def add_rate(request, project_id):
-#     url = request.META.get('HTTP_REFERER')
-#     if request.method == 'POST':
-#         form = RatingForm(request.POST)
-#         if form.is_valid():
-#             data = form.save(commit=False)
-#             data.project_id = project_id
-#             data.user_id = request.user.id  
-#             data.save()
-#             return redirect(url)
-#         # error retuen
-#     return redirect(url)
 @login_required(login_url='/authentication/login/')
 def add_comment(request, project_id):
     if request.method == 'POST':

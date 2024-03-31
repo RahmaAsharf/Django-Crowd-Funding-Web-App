@@ -1,0 +1,20 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block 'content' %}
+<h1>Tag List</h1>
+<ul>
+    {% for tag in tags %}
+    <li>
+        {{ tag.name }}
+        <form action="{% url 'update_tag' tag.id %}" method="get" style="display: inline;">
+            <button type="submit">Update</button>
+        </form>
+        <form action="{% url 'delete_tag' tag.id %}" method="post" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit">Delete</button>
+        </form>
+    </li>
+    {% endfor %}
+</ul>
+<a href="{% url 'create_tag' %}">Add New Tag</a>
+{% endblock %}

@@ -1,7 +1,3 @@
-{% extends 'layouts/base.html' %}
-{% load static %}
-
-{% block content %}
 <style>
     .card {
         border-radius: 15px;
@@ -36,6 +32,7 @@
     .card-body {
         background-color: #fff;
     }
+
 </style>
 
 <div class="container py-3">
@@ -48,43 +45,15 @@
                 <div class="card-body">
                     <form id="post_form" method="post" action="" enctype="multipart/form-data">
                         {% csrf_token %}
-                        {% for hidden in form.hidden_fields %}
-                        {{ hidden }}
-                        {% endfor %}
-                        {% for field in form.visible_fields %}
-                        <div class="mb-3">
-                            {{ field.label_tag }}
-                            {% if field.name == 'tags' %}
-                            <select class="form-control" name="tags" multiple>
-                                {% for tag in tags %}
-                                <option value="{{ tag.id }}">{{ tag.name }}</option>
-                                {% endfor %}
-                            </select>
-                            <small class="form-text text-muted">Or enter new tags separated by commas</small>
-                            <input type="text" name="new_tags" class="form-control mt-2" placeholder="Enter new tags">
-                            {% else %}
-                            {{ field }}
-                            {% endif %}
-                            {% for error in field.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            {% endfor %}
-                            {% if field.help_text %}
-                            <small class="form-text text-muted">{{ field.help_text }}</small>
-                            {% endif %}
-                        </div>
-                        {% endfor %}
+	@@ -29,10 +68,10 @@ <h1 class="display-6 text-center mb-5">Add New Project</h1>
                         <!-- Image Field -->
                         <div class="mb-3">
                             <label for="id_files">Files:</label>
-                            <input type="file" name="files" id="id_files" class="form-control" multiple required accept="image/*">
+                            <input type="file" name="files" id="id_files" class="form-control" multiple required>
                         </div>
                         <div class="text-center">
                             <button class="btn btn-info btn-comment" type="submit" name="submit">Submit</button>
                         </div>
                     </form>
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
+	
