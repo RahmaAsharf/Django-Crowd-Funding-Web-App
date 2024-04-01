@@ -19,19 +19,11 @@ User = get_user_model()
 class UserModelForm(forms.ModelForm):
     confirm_password = forms.CharField(max_length=100, widget=forms.PasswordInput)
     password = forms.CharField(max_length=100, widget=forms.PasswordInput)
-    # is_admin = forms.BooleanField(label='Is Admin', required=False, widget=forms.CheckboxInput)
-    # is_admin = forms.BooleanField(label='Is Admin', required=False)
 
     class Meta:
         model  = CustomUser
         fields= ('first_name', 'last_name', 'email', 'username', 'password','confirm_password','mobile_phone','profile_picture')
     
-    # def __init__(self, *args, **kwargs):
-    #     super().__init__(*args, **kwargs)
-    #     self.fields['is_admin'].widget.attrs['class'] = 'form-check-input'   
-    # def __init__(self, *args, **kwargs):
-    #     super().__init__(*args, **kwargs)
-    #     self.fields['is_admin'].widget.attrs.update({'class': 'checkbox'})
          
     def clean_password(self):
         password = self.cleaned_data.get('password')

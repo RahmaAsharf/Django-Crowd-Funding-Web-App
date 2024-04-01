@@ -18,7 +18,6 @@ from django.template.loader import render_to_string
 from django.http import HttpResponseRedirect
 from django.contrib import messages
 
-
 # Create your views here.
 def landing(request):
     return render(request,"authentication/landing.html")
@@ -34,7 +33,7 @@ def register(request):
         form = UserModelForm(request.POST, request.FILES)
         if form.is_valid():
             user = form.save(commit=False)
-            user.is_active = False  # User is not active until activated via email
+            user.is_active = False 
             user.save()
             # Send activation email
             activation_link = request.build_absolute_uri(reverse('activate_account', args=[user.activation_key]))

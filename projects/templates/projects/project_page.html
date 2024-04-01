@@ -178,12 +178,7 @@
                     Total donationProgress: {{ project.totalDonate }}
                 </div>
                 {% if notexpired %}
-                {% if project.totalDonate > project.total %}
-                    <div class="alert alert-danger" role="alert">
-                        Donation exceeds project total!
-                    </div>
-                {% endif %}
-                
+                {% if project.total > project.totalDonate  %}
                 <h5>Make a Donation</h5>
                 <form method="post" action="{% url 'donate' id=project.id %}">
                     {% csrf_token %}
@@ -193,9 +188,17 @@
                     </div>
                     <button type="submit" class="btn btn-info">Donate</button>
                 </form>
+
+                {% else %}
+                <div class="alert alert-success" role="alert">
+                    COMBLETED!
+                </div>
+                {% endif %}
             </div>
             {%else%}
-            <h5>Project Is Expired!!</h5>
+            <div class="alert alert-danger" role="alert">
+                Project Is Expired!!
+            </div>
             {%endif%}
             <!-- Donation progress -->
             <div class="card-footer">

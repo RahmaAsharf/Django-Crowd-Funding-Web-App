@@ -1,12 +1,8 @@
 from django.shortcuts import render, redirect , get_object_or_404
-from django.http import HttpResponse
 from projects.models import Project,Image, Tag, Category, Rating, Report, Donation , Comment
 from projects.forms import DonationForm, ProjectForm, RatingForm, CommentForm, RatingForm , ReportForm
 from decimal import Decimal
-from django.http import HttpResponseRedirect
-from django.shortcuts import render
 from django.utils import timezone
-from django.db.models import Avg
 from django.db.models import Q
 from datetime import datetime
 
@@ -54,8 +50,6 @@ def project_page(request, id):
     for report in report_elements:
         if report.comment_id is None :
             report_count += 1 
-
-    
     projectOwner= request.user.id 
 
     can_delete = False
@@ -76,11 +70,8 @@ def project_page(request, id):
     else:
         notexpired =True
 
-
-
     matching_projects = []
     unique_project_ids = set()
-
 
     for mytag in project.tags.all():
         for pro in projects:
@@ -93,24 +84,10 @@ def project_page(request, id):
                             matching_projects.append(pro)
                             unique_project_ids.add(pro.id)
                         
-                        break  # Break out of the inner loop
+                        break  
             
     return render(request, 'projects/project_page.html', {'project': project, 'can_delete': can_delete , 'matching_projects': matching_projects , 'report_count':report_count, 'projectOwner':projectOwner,'notexpired':notexpired})
 
-# def delete_conditions(request, id):
-#     project = Project.objects.get(id=id)
-#     can_delete = False
-    
-#     # Check if the current user is the creator of the project
-#     # if request.user == project.user:
-#     if project.user_id == 1 :
-#         # Calculate 25% of the total value
-#         quarter_total = project.total * 0.25
-        
-#         # Check if donations are less than 25% of the total value
-#         if project.totalDonate() < quarter_total:
-#             can_delete = True
-#     return render(request, 'projects/view_project.html', {'project': project, 'can_delete': can_delete}
 
 @login_required(login_url='/authentication/login/')
 def delete_project(request, id):
@@ -142,24 +119,12 @@ def add_rate(request, project_id):
             data.save()
             return redirect('project_page', id=project_id)
         else:
-            # Handle form validation errors
+
             print("Form errors:", form.errors)
             return render(request, 'projects/errors.html', {'errors': form.errors})
-            # Render the errors.html template with form errors
+        
     return redirect('project_page', id=project_id)
 
-# def add_rate(request, project_id):
-#     url = request.META.get('HTTP_REFERER')
-#     if request.method == 'POST':
-#         form = RatingForm(request.POST)
-#         if form.is_valid():
-#             data = form.save(commit=False)
-#             data.project_id = project_id
-#             data.user_id = request.user.id  
-#             data.save()
-#             return redirect(url)
-#         # error retuen
-#     return redirect(url)
 @login_required(login_url='/authentication/login/')
 def add_comment(request, project_id):
     if request.method == 'POST':
@@ -177,12 +142,7 @@ def add_comment(request, project_id):
 @login_required(login_url='/authentication/login/')
 def donate(request, id):
     project = get_object_or_404(Project, pk=id)
-    expiredate=project.endDate
-    notexpired =True
-    if expiredate < datetime.now().date():
-        notexpired = False
-    else:
-        notexpired =True
+
     if request.method == 'POST':
         donation_form = DonationForm(request.POST,project_id=id)
         if donation_form.is_valid():
@@ -194,7 +154,7 @@ def donate(request, id):
         else:
             return redirect('project_page', id=id)
     else:
-    # return render(request, 'projects/project_page.html', context)   
+ 
         return redirect('project_page', id=id)
       
 @login_required(login_url='/authentication/login/')
@@ -206,7 +166,7 @@ def report_project(request, id):
             report.project_id = id
             report.user = request.user 
             report.save()
-            return redirect('project_page', id=id)  # Redirect to the project detail page
+            return redirect('project_page', id=id)  
     else:
         form = ReportForm()
     
@@ -227,13 +187,9 @@ def report_comment(request, project_id, comment_id):
             report = form.save(commit=False)
             report.project_id = project_id
             report.user = request.user 
-
-            # Associate the report with the comment
             report.comment_id = comment_id
-
             report.save()
-
-            return redirect('project_page', id=project_id)  # Redirect to the project detail page
+            return redirect('project_page', id=project_id) 
     else:
         form = ReportForm()
     
